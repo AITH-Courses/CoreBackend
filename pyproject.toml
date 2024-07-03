@@ -1,0 +1,38 @@
+[tool.poetry]
+name = "aith-courses"
+version = "0.1.0"
+description = ""
+authors = ["Daniil-Solo <daniil.solo1723@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+fastapi = "^0.111.0"
+pydantic-settings = "^2.3.4"
+uvicorn = "^0.30.1"
+sqlalchemy = "^2.0.31"
+asyncpg = "^0.29.0"
+alembic = "^1.13.2"
+
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.5.0"
+pytest = "^8.2.2"
+httpx = "^0.27.0"
+pytest-asyncio = "^0.23.7"
+pytest-dotenv = "^0.5.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[pytest]
+python_files = "test_*.py"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+env_files =	[".test.env"]
+testpaths = [
+    "unit_tests",
+    "integration_tests",
+]
