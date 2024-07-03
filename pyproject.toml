@@ -36,3 +36,11 @@ testpaths = [
     "unit_tests",
     "integration_tests",
 ]
+
+[tool.ruff]
+fix=true
+unsafe-fixes=false
+line-length = 120
+lint.select = ["ALL"]
+lint.ignore = ["F401", "D211", "D213", "D100", "D104"]
+extend-include = ["*.ipynb"]

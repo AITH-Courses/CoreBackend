@@ -1,11 +1,13 @@
-from pydantic import BaseModel, Field
 from fastapi import APIRouter, status
-
+from pydantic import BaseModel, Field
 
 router = APIRouter(tags=["monitoring"])
 
 
 class Health(BaseModel):
+
+    """Health response."""
+
     status: str = Field(examples=["ok"])
 
 
@@ -19,7 +21,11 @@ class Health(BaseModel):
             "model": Health,
             "description": "Service is alive",
         },
-    }
+    },
 )
-def health_check():
+def health_check() -> Health:
+    """Check health of service.
+
+    :return: Health
+    """
     return Health(status="ok")
