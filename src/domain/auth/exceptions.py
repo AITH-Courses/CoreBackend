@@ -35,3 +35,12 @@ class UserWithEmailExistsError(DomainError):
     @property
     def message(self) -> str:
         return "User with this email already exists"
+
+
+class UserNotFoundError(DomainError):
+
+    """User is not found."""
+
+    @property
+    def message(self) -> str:
+        return "User is not found"
