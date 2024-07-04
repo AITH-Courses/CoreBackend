@@ -2,13 +2,14 @@ version: "3.9"
 services:
   postgres:
     image: postgres:14.8-alpine3.18
+    container_name: test_postgres
     environment:
       PGDATA: "/var/lib/postgresql/data/pgdata"
     env_file: ".test.env"
     volumes:
       - aithc-test-data:/var/lib/postgresql/data
     ports:
-      - "5431:5432"
+      - "5432:5432"
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $POSTGRES_USER -d $POSTGRES_DB"]
       interval: 10s
@@ -21,5 +22,43 @@ services:
         limits:
           cpus: '1'
           memory: 2G
+
+  redis:
+    image: redis:latest
+    container_name: test_redis
+    env_file: ".test.env"
+    ports:
+      - "6379:6379"
+    volumes:
+      - cache-test-data:/data
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
+        reservations:
+          cpus: '0.25'
+          memory: 256M
+    command: >
+      sh -c '
+        mkdir -p /usr/local/etc/redis &&
+        echo "bind 0.0.0.0" > /usr/local/etc/redis/redis.conf &&
+        echo "requirepass $REDIS_PASSWORD" >> /usr/local/etc/redis/redis.conf &&
+        echo "appendonly yes" >> /usr/local/etc/redis/redis.conf &&
+        echo "appendfsync everysec" >> /usr/local/etc/redis/redis.conf &&
+        echo "user default on nopass ~* +@all" > /usr/local/etc/redis/users.acl &&
+        echo "user $REDIS_USER on >$REDIS_USER_PASSWORD ~* +@all" >> /usr/local/etc/redis/users.acl &&
+        redis-server /usr/local/etc/redis/redis.conf --aclfile /usr/local/etc/redis/users.acl
+      '
+    healthcheck:
+      test: [ "CMD", "redis-cli", "-a", "$REDIS_PASSWORD", "ping" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+    restart: unless-stopped
+    tty: true
+    stdin_open: true
+
 volumes:
   aithc-test-data:
+  cache-test-data:
