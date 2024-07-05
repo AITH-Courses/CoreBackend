@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError, NoResultFound
 from src.domain.auth.entities import UserEntity
 from src.domain.auth.exceptions import UserWithEmailExistsError, UserNotFoundError
-from src.domain.auth.repository import UserRepository
+from src.domain.auth.user_repository import UserRepository
 from src.domain.auth.value_objects import Email, UserRole, PartOfName
 from src.infrastructure.sqlalchemy.users.models import User
 
@@ -16,17 +16,14 @@ class SQLAlchemyUserRepository(UserRepository):
 
     async def create(self, user: UserEntity) -> None:
         user_ = User(
-            id=user.id,
+            id=str(user.id),
             firstname=user.firstname.value,
             lastname=user.lastname.value,
             role=user.role.value,
             email=user.email.value,
             hashed_password=user.hashed_password,
         )
-        try:
-            self.session.add(user_)
-        except IntegrityError:
-            raise UserWithEmailExistsError
+        self.session.add(user_)
 
     async def update(self, user: UserEntity) -> None:
         result = await self.session.execute(select(User).filter_by(id=user.id))
@@ -52,7 +49,7 @@ class SQLAlchemyUserRepository(UserRepository):
             result = await self.session.execute(select(User).filter_by(**kwargs))
             user_ = result.scalars().one()
             return UserEntity(
-                id=user_.id,
+                id=str(user_.id),
                 firstname=PartOfName(user_.firstname),
                 lastname=PartOfName(user_.lastname),
                 role=UserRole(user_.role),
