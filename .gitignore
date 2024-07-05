@@ -1,5 +1,6 @@
 .env
 .idea
 __pycache__
+alembic/__pycache__
 .pytest_cache
 .ruff_cache
