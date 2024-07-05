@@ -13,6 +13,7 @@ uvicorn = "^0.30.1"
 sqlalchemy = "^2.0.31"
 asyncpg = "^0.29.0"
 alembic = "^1.13.2"
+redis = "^5.0.7"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -42,5 +43,5 @@ fix=true
 unsafe-fixes=false
 line-length = 120
 lint.select = ["ALL"]
-lint.ignore = ["F401", "D211", "D213", "D100", "D104"]
+lint.ignore = ["F401", "D211", "D213", "D100", "D104", "D102", "D107", "ANN003", "B008"]
 extend-include = ["*.ipynb"]

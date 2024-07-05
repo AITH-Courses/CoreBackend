@@ -1,6 +1,7 @@
 from sqlalchemy import MetaData
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import declarative_base
+
 from src.config import app_config
 
 async_engine = create_async_engine(url=app_config.db_url, echo=app_config.is_debug)
