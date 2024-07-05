@@ -1,11 +1,7 @@
-import re
 from dataclasses import dataclass
 
+from src.domain.auth.constants import USER_ROLES, EMAIL_PATTERN
 from src.domain.auth.exceptions import EmailNotValidError, EmptyPartOfNameError, RoleDoesntExistError
-
-EMAIL_REGULAR_EXPRESSION = r"[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}"
-EMAIL_PATTERN = re.compile(EMAIL_REGULAR_EXPRESSION)
-USER_ROLES = ["admin", "talent"]
 
 
 @dataclass(init=False, eq=True, frozen=True)
