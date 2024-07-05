@@ -3,6 +3,7 @@ import uuid
 
 from sqlalchemy import text
 from sqlalchemy.orm import Mapped, mapped_column
+
 from src.infrastructure.sqlalchemy.session import Base
 
 

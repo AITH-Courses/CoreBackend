@@ -5,14 +5,17 @@ from sqlalchemy.exc import IntegrityError
 from src.domain.auth.constants import TALENT_ROLE
 from src.domain.auth.entities import UserEntity
 from src.domain.auth.exceptions import UserWithEmailExistsError
-from src.domain.auth.value_objects import PartOfName, UserRole, Email
+from src.domain.auth.value_objects import Email, PartOfName, UserRole
 from src.infrastructure.security.password_service import PasswordService
 from src.services.auth.session_service import SessionService
 from src.services.auth.unit_of_work import AuthUnitOfWork
 
 
 class AuthCommandService:
-    def __init__(self, uow: AuthUnitOfWork, session_service: SessionService):
+
+    """Class implemented CQRS pattern, command class."""
+
+    def __init__(self, uow: AuthUnitOfWork, session_service: SessionService) -> None:
         self.uow = uow
         self.session_service = session_service
 
@@ -31,7 +34,7 @@ class AuthCommandService:
             await self.uow.commit()
         except IntegrityError:
             await self.uow.rollback()
-            raise UserWithEmailExistsError
+            raise UserWithEmailExistsError from IntegrityError
         await self.session_service.set(auth_token, user)
         return auth_token
 
@@ -47,5 +50,4 @@ class AuthCommandService:
         await self.session_service.delete(auth_token)
 
     async def me(self, auth_token: str) -> UserEntity:
-        user = await self.session_service.get(auth_token)
-        return user
+        return await self.session_service.get(auth_token)

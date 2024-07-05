@@ -5,6 +5,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class ApplicationMode(Enum):
+
     """Variants of application mode."""
 
     DEV = "dev"
@@ -13,6 +14,7 @@ class ApplicationMode(Enum):
 
 
 class Config(BaseSettings):
+
     """Class for loading the necessary env variables."""
 
     POSTGRES_DB: str
@@ -56,7 +58,7 @@ class Config(BaseSettings):
         )
 
     @staticmethod
-    def __get_redis_cache_url(user: str, password: str, host: str, port: str):
+    def __get_redis_cache_url(user: str, password: str, host: str, port: str) -> str:
         """Get redis cache url.
 
         :param user:
@@ -71,10 +73,10 @@ class Config(BaseSettings):
     def cache_url(self) -> str:
         """Get DSN to cache."""
         return self.__get_redis_cache_url(
-            self.REDIS_USER, self.REDIS_USER_PASSWORD, self.REDIS_HOST, self.REDIS_PORT
+            self.REDIS_USER, self.REDIS_USER_PASSWORD, self.REDIS_HOST, self.REDIS_PORT,
         )
 
-    model_config = SettingsConfigDict(env_file=".env", extra='ignore')
+    model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 
 app_config = Config()

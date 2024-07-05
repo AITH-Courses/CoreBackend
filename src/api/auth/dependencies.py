@@ -1,4 +1,4 @@
-from fastapi import Header, Depends, HTTPException, status
+from fastapi import Depends, Header, HTTPException, status
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -15,13 +15,23 @@ def get_auth_service(
     db_session: AsyncSession = Depends(get_async_session),
     cache_session: Redis = Depends(get_redis_session),
 ) -> AuthCommandService:
+    """Get auth service on sessions.
+
+    :param db_session:
+    :param cache_session:
+    :return:
+    """
     unit_of_work = SQLAlchemyAuthUnitOfWork(db_session)
     session_service = RedisSessionService(cache_session)
-    command_service = AuthCommandService(unit_of_work, session_service)
-    return command_service
+    return AuthCommandService(unit_of_work, session_service)
 
 
 def get_auth_token(authentication: str = Header(default="Bearer token")) -> str:
+    """Get auth token from header.
+
+    :param authentication:
+    :return:
+    """
     _, auth_token = authentication.split()  # skip "bearer" part
     return auth_token
 
@@ -30,11 +40,17 @@ async def get_user(
     auth_token: str = Depends(get_auth_token),
     auth_service: AuthCommandService = Depends(get_auth_service),
 ) -> UserDTO:
+    """Get user on auth token.
+
+    :param auth_token:
+    :param auth_service:
+    :return:
+    """
     try:
         user = await auth_service.me(auth_token)
         return UserDTO(id=user.id, firstname=user.firstname.value, lastname=user.lastname.value, email=user.email.value)
-    except UserBySessionNotFoundError:
+    except UserBySessionNotFoundError as ex:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=ErrorResponse(message="You need to login to your account").model_dump(),
-        )
+        ) from ex

@@ -1,12 +1,18 @@
-from abc import ABC, abstractmethod
-from typing import Optional
+from __future__ import annotations
 
-from src.domain.auth.entities import UserEntity
+from abc import ABC, abstractmethod
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from src.domain.auth.entities import UserEntity
 
 
 class SessionService(ABC):
+
+    """Base class for session as service."""
+
     @abstractmethod
-    async def get(self, auth_token: str) -> Optional[UserEntity]:
+    async def get(self, auth_token: str) -> UserEntity:
         raise NotImplementedError
 
     @abstractmethod

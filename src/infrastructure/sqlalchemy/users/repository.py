@@ -1,17 +1,19 @@
 from sqlalchemy import select
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.exc import IntegrityError, NoResultFound
+from sqlalchemy.ext.asyncio import AsyncSession
+
 from src.domain.auth.entities import UserEntity
-from src.domain.auth.exceptions import UserWithEmailExistsError, UserNotFoundError
+from src.domain.auth.exceptions import UserNotFoundError, UserWithEmailExistsError
 from src.domain.auth.user_repository import UserRepository
-from src.domain.auth.value_objects import Email, UserRole, PartOfName
+from src.domain.auth.value_objects import Email, PartOfName, UserRole
 from src.infrastructure.sqlalchemy.users.models import User
 
 
 class SQLAlchemyUserRepository(UserRepository):
+
     """SqlAlchemy implementation of Repository for User."""
 
-    def __init__(self, session: AsyncSession):
+    def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
     async def create(self, user: UserEntity) -> None:
@@ -44,7 +46,7 @@ class SQLAlchemyUserRepository(UserRepository):
     async def get_by_email(self, email: Email) -> UserEntity:
         return await self.get_by_field(email=email.value)
 
-    async def get_by_field(self, **kwargs):
+    async def get_by_field(self, **kwargs) -> UserEntity:
         try:
             result = await self.session.execute(select(User).filter_by(**kwargs))
             user_ = result.scalars().one()
@@ -57,4 +59,4 @@ class SQLAlchemyUserRepository(UserRepository):
                 hashed_password=user_.hashed_password,
             )
         except NoResultFound:
-            raise UserNotFoundError
+            raise UserNotFoundError from NoResultFound

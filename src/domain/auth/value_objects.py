@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from src.domain.auth.constants import USER_ROLES, EMAIL_PATTERN
+from src.domain.auth.constants import EMAIL_PATTERN, USER_ROLES
 from src.domain.auth.exceptions import EmailNotValidError, EmptyPartOfNameError, RoleDoesntExistError
 
 

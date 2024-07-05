@@ -62,7 +62,7 @@ class WrongPasswordError(DomainError):
 
     @property
     def message(self) -> str:
-        return f"It is a wrong password"
+        return "It is a wrong password"
 
 
 class UserBySessionNotFoundError(DomainError):
@@ -71,4 +71,4 @@ class UserBySessionNotFoundError(DomainError):
 
     @property
     def message(self) -> str:
-        return f"User is not found by session"
+        return "User is not found by session"

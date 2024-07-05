@@ -5,15 +5,18 @@ from src.services.auth.unit_of_work import AuthUnitOfWork
 
 
 class SQLAlchemyAuthUnitOfWork(AuthUnitOfWork):
-    def __init__(self, sqla_session: AsyncSession):
+
+    """SQLA implementation for unit of work."""
+
+    def __init__(self, sqla_session: AsyncSession) -> None:
         self.session = sqla_session
         self.user_repo = SQLAlchemyUserRepository(sqla_session)
 
-    async def begin(self):
+    async def begin(self) -> None:
         await self.session.begin()
 
-    async def commit(self):
+    async def commit(self) -> None:
         await self.session.commit()
 
-    async def rollback(self):
+    async def rollback(self) -> None:
         await self.session.rollback()

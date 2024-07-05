@@ -1,8 +1,8 @@
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse
 
-from src.api.health_check import router as health_check_router
 from src.api.auth.router import router as auth_router
+from src.api.health_check import router as health_check_router
 from src.config import app_config
 from src.exceptions import ApplicationError
 from src.infrastructure.fastapi.docs import add_custom_docs_endpoints
