@@ -3,10 +3,11 @@ from typing import AsyncGenerator
 import pytest
 from fastapi import FastAPI
 from httpx import AsyncClient, ASGITransport
-from sqlalchemy.sql.expression import text
+from redis import asyncio as aioredis
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncEngine, AsyncSession
 
 from src.app import create_application
+from src.config import app_config
 from src.infrastructure.sqlalchemy.session import async_engine, Base
 
 
@@ -45,6 +46,14 @@ async def test_async_session(async_db_engine: AsyncEngine):
     )
     async with async_session_factory() as session:
         yield session
+
+
+@pytest.fixture(scope='function')
+async def test_cache_session():
+    async with aioredis.from_url(app_config.cache_url) as session:
+        await session.flushall()
+        yield session
+        await session.flushall()
 
 
 @pytest.fixture(scope='session')

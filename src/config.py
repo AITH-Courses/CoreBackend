@@ -65,7 +65,7 @@ class Config(BaseSettings):
         :param port:
         :return: dns
         """
-        return f"redis://[[{user}]:[{password}]]@{host}:{port}/0"
+        return f"redis://{user}:{password}@{host}:{port}/0"
 
     @property
     def cache_url(self) -> str:
@@ -74,7 +74,7 @@ class Config(BaseSettings):
             self.REDIS_USER, self.REDIS_USER_PASSWORD, self.REDIS_HOST, self.REDIS_PORT
         )
 
-    model_config = SettingsConfigDict(env_file=".env")
+    model_config = SettingsConfigDict(env_file=".env", extra='ignore')
 
 
 app_config = Config()
