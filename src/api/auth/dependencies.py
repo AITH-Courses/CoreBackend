@@ -32,8 +32,13 @@ def get_auth_token(authentication: str = Header(default="Bearer token")) -> str:
     :param authentication:
     :return:
     """
-    _, auth_token = authentication.split()  # skip "bearer" part
-    return auth_token
+    if authentication.startswith("Bearer") and " " in authentication:
+        _, auth_token = authentication.split()  # skip "bearer" part
+        return auth_token
+    raise HTTPException(
+        status_code=status.HTTP_401_UNAUTHORIZED,
+        detail=ErrorResponse(message="You need to specify Bearer token in authorization header").model_dump(),
+    )
 
 
 async def get_user(

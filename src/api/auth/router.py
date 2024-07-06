@@ -25,11 +25,11 @@ router = APIRouter(prefix="/auth", tags=["auth"])
 
 @router.post(
     "/register",
-    status_code=status.HTTP_200_OK,
+    status_code=status.HTTP_201_CREATED,
     description="Register talent in system",
     summary="Registration",
     responses={
-        status.HTTP_200_OK: {
+        status.HTTP_201_CREATED: {
             "model": AuthTokenResponse,
             "description": "Registration is successful",
         },
@@ -42,11 +42,12 @@ router = APIRouter(prefix="/auth", tags=["auth"])
             "description": "Error in registration",
         },
     },
+    response_model=AuthTokenResponse,
 )
 async def register_talent(
     data: RegisterRequest,
     auth_service: AuthCommandService = Depends(get_auth_service),
-) -> AuthTokenResponse:
+) -> JSONResponse:
     """Register new user.
 
     :param data:
@@ -57,22 +58,20 @@ async def register_talent(
         auth_token = await auth_service.register_talent(
             data.firstname, data.lastname, data.email, data.password,
         )
-    except (EmailNotValidError, EmptyPartOfNameError) as ex:
-        raise HTTPException(
+    except (EmailNotValidError, EmptyPartOfNameError, PasswordTooShortError) as ex:
+        return JSONResponse(
+            content=ErrorResponse(message=ex.message).model_dump(),
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=ErrorResponse(message=ex.message).model_dump(),
-        ) from ex
-    except PasswordTooShortError as ex:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=ErrorResponse(message=ex.message).model_dump(),
-        ) from ex
+        )
     except UserWithEmailExistsError as ex:
-        raise HTTPException(
+        return JSONResponse(
+            content=ErrorResponse(message=ex.message).model_dump(),
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=ErrorResponse(message=ex.message).model_dump(),
-        ) from ex
-    return AuthTokenResponse(auth_token=auth_token)
+        )
+    return JSONResponse(
+        content=AuthTokenResponse(auth_token=auth_token).model_dump(),
+        status_code=status.HTTP_201_CREATED,
+    )
 
 
 @router.post(
@@ -94,11 +93,12 @@ async def register_talent(
             "description": "Error in login",
         },
     },
+    response_model=AuthTokenResponse,
 )
 async def login_user(
     data: LoginRequest,
     auth_service: AuthCommandService = Depends(get_auth_service),
-) -> AuthTokenResponse:
+) -> JSONResponse:
     """Login user.
 
     :param data:
@@ -110,16 +110,19 @@ async def login_user(
             data.email, data.password,
         )
     except EmailNotValidError as ex:
-        raise HTTPException(
+        return JSONResponse(
+            content=ErrorResponse(message=ex.message).model_dump(),
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=ErrorResponse(message=ex.message).model_dump(),
-        ) from ex
+        )
     except (WrongPasswordError, UserNotFoundError) as ex:
-        raise HTTPException(
+        return JSONResponse(
+            content=ErrorResponse(message=ex.message).model_dump(),
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=ErrorResponse(message=ex.message).model_dump(),
-        ) from ex
-    return AuthTokenResponse(auth_token=auth_token)
+        )
+    return JSONResponse(
+        content=AuthTokenResponse(auth_token=auth_token).model_dump(),
+        status_code=status.HTTP_200_OK,
+    )
 
 
 @router.post(
@@ -133,11 +136,12 @@ async def login_user(
             "description": "Log out is successful",
         },
     },
+    response_model=SuccessResponse,
 )
 async def logout_user(
     auth_token: str = Depends(get_auth_token),
     auth_service: AuthCommandService = Depends(get_auth_service),
-) -> SuccessResponse:
+) -> JSONResponse:
     """Logout current user.
 
     :param auth_token:
@@ -145,17 +149,20 @@ async def logout_user(
     :return:
     """
     await auth_service.logout(auth_token)
-    return SuccessResponse(message="Log out is successful")
+    return JSONResponse(
+        content=SuccessResponse(message="Log out is successful").model_dump(),
+        status_code=status.HTTP_200_OK,
+    )
 
 
-@router.post(
+@router.get(
     "/me",
     status_code=status.HTTP_200_OK,
-    description="Logout user in system",
-    summary="Log out",
+    description="Get current user",
+    summary="Getting user",
     responses={
         status.HTTP_200_OK: {
-            "model": SuccessResponse,
+            "model": UserDTO,
             "description": "Getting current user is successful",
         },
         status.HTTP_401_UNAUTHORIZED: {
@@ -163,13 +170,17 @@ async def logout_user(
             "description": "No session",
         },
     },
+    response_model=UserDTO,
 )
 async def get_current_user(
     user: UserDTO = Depends(get_user),
-) -> UserDTO:
+) -> JSONResponse:
     """Get current user on auth token.
 
     :param user:
     :return:
     """
-    return user
+    return JSONResponse(
+        content=user.model_dump(),
+        status_code=status.HTTP_200_OK,
+    )

@@ -32,9 +32,9 @@ class AuthCommandService:
         try:
             await self.uow.user_repo.create(user)
             await self.uow.commit()
-        except IntegrityError:
+        except IntegrityError as ex:
             await self.uow.rollback()
-            raise UserWithEmailExistsError from IntegrityError
+            raise UserWithEmailExistsError from ex
         await self.session_service.set(auth_token, user)
         return auth_token
 
