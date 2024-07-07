@@ -26,14 +26,14 @@ def get_auth_service(
     return AuthCommandService(unit_of_work, session_service)
 
 
-def get_auth_token(authentication: str = Header(default="Bearer token")) -> str:
+def get_auth_token(authorization: str = Header(default="Bearer token")) -> str:
     """Get auth token from header.
 
-    :param authentication:
+    :param authorization:
     :return:
     """
-    if authentication.startswith("Bearer") and " " in authentication:
-        _, auth_token = authentication.split()  # skip "bearer" part
+    if authorization.startswith("Bearer") and " " in authorization:
+        _, auth_token = authorization.split()  # skip "bearer" part
         return auth_token
     raise HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -53,7 +53,13 @@ async def get_user(
     """
     try:
         user = await auth_service.me(auth_token)
-        return UserDTO(id=user.id, firstname=user.firstname.value, lastname=user.lastname.value, email=user.email.value)
+        return UserDTO(
+            id=user.id,
+            firstname=user.firstname.value,
+            lastname=user.lastname.value,
+            email=user.email.value,
+            role=user.role.value,
+        )
     except UserBySessionNotFoundError as ex:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

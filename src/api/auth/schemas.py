@@ -48,3 +48,4 @@ class UserDTO(BaseModel):
     firstname: str = Field("Johny")
     lastname: str = Field("Stark")
     email: str = Field("john@mail.com")
+    role: str = Field("talent")

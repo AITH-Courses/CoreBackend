@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 from starlette.responses import JSONResponse
 
 from src.api.auth.dependencies import get_auth_service, get_auth_token, get_user
