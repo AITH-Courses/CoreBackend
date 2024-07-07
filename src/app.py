@@ -1,4 +1,5 @@
 from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
 from src.api.auth.router import router as auth_router
@@ -14,6 +15,7 @@ def add_exception_handler(application: FastAPI) -> None:
     :param application:
     :return:
     """
+
     @application.exception_handler(ApplicationError)
     async def unicorn_exception_handler(_: Request, exc: ApplicationError) -> JSONResponse:
         """Handle application error.
@@ -38,6 +40,21 @@ def add_routers(application: FastAPI) -> None:
     application.include_router(router=auth_router)
 
 
+def add_cors(application: FastAPI) -> None:
+    """Add routers into FastAPI-application.
+
+    :param application:
+    :return: nothing
+    """
+    application.add_middleware(
+        CORSMiddleware,
+        allow_origins=["*"],
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+
+
 def create_application() -> FastAPI:
     """Create FastAPI-application.
 
@@ -53,6 +70,8 @@ def create_application() -> FastAPI:
         add_custom_docs_endpoints(application)
     add_routers(application)
     add_exception_handler(application)
+    if app_config.is_debug:
+        add_cors(application)
     return application
 
 
