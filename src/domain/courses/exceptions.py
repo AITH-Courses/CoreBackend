@@ -27,6 +27,7 @@ class EmptyPropertyError(DomainError):
 
 
 class IncorrectCourseRunNameError(DomainError):
+
     """Course run has incorrect name."""
 
     @property
@@ -36,6 +37,7 @@ class IncorrectCourseRunNameError(DomainError):
 
 @dataclass
 class CoursePublishError(DomainError):
+
     """Course run has incorrect name."""
 
     error_message: str
@@ -43,3 +45,12 @@ class CoursePublishError(DomainError):
     @property
     def message(self) -> str:
         return self.error_message
+
+
+class CourseNotFoundError(DomainError):
+
+    """Course is not found."""
+
+    @property
+    def message(self) -> str:
+        return "Course is not found"

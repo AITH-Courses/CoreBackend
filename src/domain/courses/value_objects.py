@@ -132,7 +132,7 @@ class CourseRun:
             if season not in ("Осень", "Весна"):
                 raise IncorrectCourseRunNameError
             year = int(year_string)
-            if year < 2020:
+            if year < 2020 or year > 2030:
                 raise IncorrectCourseRunNameError
         except ValueError as ex:
             raise IncorrectCourseRunNameError from ex
