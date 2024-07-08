@@ -4,12 +4,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.domain.auth.entities import UserEntity
 from src.domain.auth.exceptions import UserNotFoundError
-from src.domain.auth.user_repository import UserRepository
+from src.domain.auth.user_repository import IUserRepository
 from src.domain.auth.value_objects import Email
 from src.infrastructure.sqlalchemy.users.models import User
 
 
-class SQLAlchemyUserRepository(UserRepository):
+class SQLAlchemyUserRepository(IUserRepository):
 
     """SqlAlchemy implementation of Repository for User."""
 

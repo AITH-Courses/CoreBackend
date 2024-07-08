@@ -1,12 +1,10 @@
 import uuid
-from typing import Coroutine
 
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.domain.auth.entities import UserEntity
 from src.domain.auth.exceptions import UserNotFoundError
-from src.domain.auth.user_repository import UserRepository
 from src.domain.auth.value_objects import PartOfName, UserRole, Email
 from src.infrastructure.sqlalchemy.users.repository import SQLAlchemyUserRepository
 
