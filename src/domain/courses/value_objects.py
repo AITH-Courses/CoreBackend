@@ -1,11 +1,21 @@
 from dataclasses import dataclass
 
-from src.domain.courses.exceptions import EmptyPropertyError, ValueDoesntExistError, IncorrectCourseRunNameError
-from src.domain.courses.constants import IMPLEMENTERS, FORMATS, TERMS, ROLES, PERIODS
+from src.domain.courses.constants import (
+    COURSE_RUN_FROM_YEAR,
+    COURSE_RUN_SEASONS,
+    COURSE_RUN_TO_YEAR,
+    FORMATS,
+    IMPLEMENTERS,
+    PERIODS,
+    ROLES,
+    TERMS,
+)
+from src.domain.courses.exceptions import EmptyPropertyError, IncorrectCourseRunNameError, ValueDoesntExistError
 
 
 @dataclass(init=False, eq=True, frozen=True)
 class CourseName:
+
     """Name of course as a value object."""
 
     value: str
@@ -22,6 +32,7 @@ class CourseName:
 
 @dataclass(init=False, eq=True, frozen=True)
 class Author:
+
     """Author information as a value object."""
 
     value: str
@@ -38,6 +49,7 @@ class Author:
 
 @dataclass(init=False, eq=True, frozen=True)
 class Implementer:
+
     """Implementer represents an implementer as a value object."""
 
     value: str
@@ -48,12 +60,13 @@ class Implementer:
         :param value:
         """
         if value not in IMPLEMENTERS:
-            raise ValueDoesntExistError("implementer")
+            raise ValueDoesntExistError(property_name="implementer")
         object.__setattr__(self, "value", value)
 
 
 @dataclass(init=False, eq=True, frozen=True)
 class Format:
+
     """Format represents an format as a value object."""
 
     value: str
@@ -64,12 +77,13 @@ class Format:
         :param value:
         """
         if value not in FORMATS:
-            raise ValueDoesntExistError("format")
+            raise ValueDoesntExistError(property_name="format")
         object.__setattr__(self, "value", value)
 
 
 @dataclass(init=False, eq=True, frozen=True)
 class Terms:
+
     """Term numbers as a value object."""
 
     value: str
@@ -80,12 +94,13 @@ class Terms:
         :param value:
         """
         if value not in TERMS:
-            raise ValueDoesntExistError("terms")
+            raise ValueDoesntExistError(property_name="terms")
         object.__setattr__(self, "value", value)
 
 
 @dataclass(init=False, eq=True, frozen=True)
 class Role:
+
     """Role name as a value object."""
 
     value: str
@@ -96,12 +111,13 @@ class Role:
         :param value:
         """
         if value not in ROLES:
-            raise ValueDoesntExistError("role")
+            raise ValueDoesntExistError(property_name="role")
         object.__setattr__(self, "value", value)
 
 
 @dataclass(init=False, eq=True, frozen=True)
 class Period:
+
     """Period name as a value object: september, november and other."""
 
     value: str
@@ -112,12 +128,13 @@ class Period:
         :param value:
         """
         if value not in PERIODS:
-            raise ValueDoesntExistError("period")
+            raise ValueDoesntExistError(property_name="period")
         object.__setattr__(self, "value", value)
 
 
 @dataclass(init=False, eq=True, frozen=True)
 class CourseRun:
+
     """Run of course as a value object: Autumn 2023."""
 
     value: str
@@ -129,10 +146,10 @@ class CourseRun:
         """
         try:
             season, year_string = value.split()
-            if season not in ("Осень", "Весна"):
+            if season not in COURSE_RUN_SEASONS:
                 raise IncorrectCourseRunNameError
             year = int(year_string)
-            if year < 2020 or year > 2030:
+            if year < COURSE_RUN_FROM_YEAR or year > COURSE_RUN_TO_YEAR:
                 raise IncorrectCourseRunNameError
         except ValueError as ex:
             raise IncorrectCourseRunNameError from ex

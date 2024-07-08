@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING
 from src.domain.courses.exceptions import CoursePublishError
 
 if TYPE_CHECKING:
-    from src.domain.courses.value_objects import Implementer, CourseName, Format, Terms, Role, Period, Author, CourseRun
+    from src.domain.courses.value_objects import Author, CourseName, CourseRun, Format, Implementer, Period, Role, Terms
 
 
 @dataclass
@@ -35,7 +35,7 @@ class CourseEntity:
     periods: list[Period] = field(default_factory=list)
     last_runs: list[CourseRun] = field(default_factory=list)
 
-    def publish(self):
+    def publish(self) -> None:
         if not self.is_draft:
             raise CoursePublishError(error_message="Course has already published")
         if self.image_url is None:
@@ -54,7 +54,7 @@ class CourseEntity:
             raise CoursePublishError(error_message="No time of implementing course")
         self.is_draft = False
 
-    def hide(self):
+    def hide(self) -> None:
         if self.is_draft:
             raise CoursePublishError(error_message="Course has already hided")
         self.is_draft = True

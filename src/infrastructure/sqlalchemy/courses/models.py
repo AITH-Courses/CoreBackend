@@ -1,21 +1,24 @@
-import datetime
-import uuid
+from __future__ import annotations
 
-from sqlalchemy import text, Text, ForeignKey
+import datetime
+from typing import TYPE_CHECKING
+
+from sqlalchemy import ForeignKey, Text, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.domain.courses.entities import CourseEntity
-from src.domain.courses.value_objects import CourseName, Author, Implementer, Format, Terms, Role, Period, CourseRun
+from src.domain.courses.value_objects import Author, CourseName, CourseRun, Format, Implementer, Period, Role, Terms
 from src.infrastructure.sqlalchemy.session import Base
 
-
+if TYPE_CHECKING:
+    from uuid import UUID
 class Course(Base):
 
     """SQLAlchemy model of Course."""
 
     __tablename__ = "courses"
 
-    id: Mapped[uuid.UUID] = mapped_column(primary_key=True)
+    id: Mapped[UUID] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(nullable=False, unique=True)
     image_url: Mapped[str] = mapped_column(nullable=True)
     limits: Mapped[int] = mapped_column(nullable=True)
@@ -34,9 +37,9 @@ class Course(Base):
     format: Mapped[str] = mapped_column(nullable=True)
     terms: Mapped[str] = mapped_column(nullable=True)
 
-    roles: Mapped[list["RoleForCourse"]] = relationship(back_populates="course")
-    periods: Mapped[list["PeriodForCourse"]] = relationship(back_populates="course")
-    runs: Mapped[list["RunForCourse"]] = relationship(back_populates="course")
+    roles: Mapped[list[RoleForCourse]] = relationship(back_populates="course")
+    periods: Mapped[list[PeriodForCourse]] = relationship(back_populates="course")
+    runs: Mapped[list[RunForCourse]] = relationship(back_populates="course")
 
     created_at: Mapped[datetime.datetime] = mapped_column(
         server_default=text("TIMEZONE('utc', now())"),
@@ -47,7 +50,7 @@ class Course(Base):
     )
 
     @staticmethod
-    def from_domain(course: CourseEntity) -> "Course":
+    def from_domain(course: CourseEntity) -> Course:
         return Course(
             id=course.id,
             name=course.name.value,
@@ -98,9 +101,9 @@ class RoleForCourse(Base):
 
     __tablename__ = "course_roles"
 
-    course_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("courses.id"), primary_key=True)
+    course_id: Mapped[UUID] = mapped_column(ForeignKey("courses.id"), primary_key=True)
     role_name: Mapped[str] = mapped_column(primary_key=True)
-    course: Mapped["Course"] = relationship(back_populates="roles")
+    course: Mapped[Course] = relationship(back_populates="roles")
 
 
 class PeriodForCourse(Base):
@@ -109,9 +112,9 @@ class PeriodForCourse(Base):
 
     __tablename__ = "course_periods"
 
-    course_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("courses.id"), primary_key=True)
+    course_id: Mapped[UUID] = mapped_column(ForeignKey("courses.id"), primary_key=True)
     period_name: Mapped[str] = mapped_column(primary_key=True)
-    course: Mapped["Course"] = relationship(back_populates="periods")
+    course: Mapped[Course] = relationship(back_populates="periods")
 
 
 class RunForCourse(Base):
@@ -120,6 +123,6 @@ class RunForCourse(Base):
 
     __tablename__ = "course_runs"
 
-    course_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("courses.id"), primary_key=True)
+    course_id: Mapped[UUID] = mapped_column(ForeignKey("courses.id"), primary_key=True)
     run_name: Mapped[str] = mapped_column(primary_key=True)
-    course: Mapped["Course"] = relationship(back_populates="runs")
+    course: Mapped[Course] = relationship(back_populates="runs")

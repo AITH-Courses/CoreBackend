@@ -17,6 +17,7 @@ class ValueDoesntExistError(DomainError):
 
 @dataclass
 class EmptyPropertyError(DomainError):
+
     """Property is empty."""
 
     property_name: str

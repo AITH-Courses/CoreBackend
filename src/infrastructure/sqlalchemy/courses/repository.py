@@ -6,8 +6,7 @@ from sqlalchemy.orm import joinedload
 from src.domain.courses.course_repository import ICourseRepository
 from src.domain.courses.entities import CourseEntity
 from src.domain.courses.exceptions import CourseNotFoundError
-from src.domain.courses.value_objects import CourseName, Author, Implementer, Format, CourseRun, Period, Role, Terms
-from src.infrastructure.sqlalchemy.courses.models import Course, RoleForCourse, PeriodForCourse, RunForCourse
+from src.infrastructure.sqlalchemy.courses.models import Course, PeriodForCourse, RoleForCourse, RunForCourse
 
 
 class SQLAlchemyCourseRepository(ICourseRepository):
