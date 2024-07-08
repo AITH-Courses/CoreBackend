@@ -4,7 +4,7 @@ from src.domain.auth.entities import UserEntity
 from src.domain.auth.value_objects import Email
 
 
-class UserRepository(ABC):
+class IUserRepository(ABC):
 
     """Interface of Repository for User."""
 
