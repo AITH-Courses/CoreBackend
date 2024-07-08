@@ -4,6 +4,8 @@ import uuid
 from sqlalchemy import text
 from sqlalchemy.orm import Mapped, mapped_column
 
+from src.domain.auth.entities import UserEntity
+from src.domain.auth.value_objects import PartOfName, Email, UserRole
 from src.infrastructure.sqlalchemy.session import Base
 
 
@@ -26,3 +28,24 @@ class User(Base):
         server_default=text("TIMEZONE('utc', now())"),
         onupdate=datetime.datetime.utcnow,
     )
+
+    def to_domain(self):
+        return UserEntity(
+            id=str(self.id),
+            firstname=PartOfName(self.firstname),
+            lastname=PartOfName(self.lastname),
+            role=UserRole(self.role),
+            email=Email(self.email),
+            hashed_password=self.hashed_password,
+        )
+
+    @staticmethod
+    def from_domain(user: UserEntity):
+        return User(
+            id=str(user.id),
+            firstname=user.firstname.value,
+            lastname=user.lastname.value,
+            role=user.role.value,
+            email=user.email.value,
+            hashed_password=user.hashed_password,
+        )
