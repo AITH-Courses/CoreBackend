@@ -22,10 +22,10 @@ class RedisSessionService(SessionService):
         user_dict = {
             "id": user.id,
             "firstname": user.firstname.value,
-            "lastname" : user.lastname.value,
+            "lastname": user.lastname.value,
             "role": user.role.value,
-            "email" :user.email.value,
-            "hashed_password":user.hashed_password,
+            "email": user.email.value,
+            "hashed_password": user.hashed_password,
         }
         return json.dumps(user_dict)
 
