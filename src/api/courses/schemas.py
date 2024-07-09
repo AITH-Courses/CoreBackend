@@ -30,7 +30,7 @@ class CourseFullDTO(BaseModel):
 
     @staticmethod
     def from_domain(course: CourseEntity):
-        return CourseShortDTO(
+        return CourseFullDTO(
             id=course.id,
             name=course.name.value,
             image_url=course.image_url,
