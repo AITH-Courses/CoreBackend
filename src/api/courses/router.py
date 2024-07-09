@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
 
-from src.api.auth.schemas import ErrorResponse
+from src.api.base_schemas import ErrorResponse
 from src.api.courses.dependencies import get_talent_courses_query_service
 from src.api.courses.schemas import CourseShortDTO, CourseFullDTO
 from src.domain.courses.exceptions import CourseNotFoundError

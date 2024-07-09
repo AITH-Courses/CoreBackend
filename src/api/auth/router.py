@@ -4,12 +4,11 @@ from starlette.responses import JSONResponse
 from src.api.auth.dependencies import get_auth_service, get_auth_token, get_user
 from src.api.auth.schemas import (
     AuthTokenResponse,
-    ErrorResponse,
     LoginRequest,
     RegisterRequest,
-    SuccessResponse,
     UserDTO,
 )
+from src.api.base_schemas import ErrorResponse, SuccessResponse
 from src.domain.auth.exceptions import (
     EmailNotValidError,
     EmptyPartOfNameError,
