@@ -1,8 +1,10 @@
 from fastapi import Depends, Header, HTTPException, status
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from src.api.auth.schemas import ErrorResponse, UserDTO
+from src.api.auth.schemas import UserDTO
+from src.api.base_schemas import ErrorResponse
 from src.domain.auth.exceptions import UserBySessionNotFoundError
 from src.infrastructure.redis.auth.session_service import RedisSessionService
 from src.infrastructure.redis.session import get_redis_session
@@ -12,8 +14,8 @@ from src.services.auth.command_service import AuthCommandService
 
 
 def get_auth_service(
-    db_session: AsyncSession = Depends(get_async_session),
-    cache_session: Redis = Depends(get_redis_session),
+        db_session: AsyncSession = Depends(get_async_session),
+        cache_session: Redis = Depends(get_redis_session),
 ) -> AuthCommandService:
     """Get auth service on sessions.
 
@@ -26,24 +28,23 @@ def get_auth_service(
     return AuthCommandService(unit_of_work, session_service)
 
 
-def get_auth_token(authorization: str = Header(default="Bearer token")) -> str:
+def get_auth_token(credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer(auto_error=False))) -> str:
     """Get auth token from header.
 
-    :param authorization:
+    :param credentials:
     :return:
     """
-    if authorization.startswith("Bearer") and " " in authorization:
-        _, auth_token = authorization.split()  # skip "bearer" part
-        return auth_token
-    raise HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail=ErrorResponse(message="You need to specify Bearer token in authorization header").model_dump(),
-    )
+    if not credentials:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=ErrorResponse(message="You need to specify Bearer token in authorization header").model_dump(),
+        )
+    return credentials.credentials
 
 
 async def get_user(
-    auth_token: str = Depends(get_auth_token),
-    auth_service: AuthCommandService = Depends(get_auth_service),
+        auth_token: str = Depends(get_auth_token),
+        auth_service: AuthCommandService = Depends(get_auth_service),
 ) -> UserDTO:
     """Get user on auth token.
 
