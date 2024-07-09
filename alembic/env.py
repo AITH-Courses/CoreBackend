@@ -8,6 +8,7 @@ from alembic import context
 from src.config import app_config
 from src.infrastructure.sqlalchemy.session import Base
 from src.infrastructure.sqlalchemy.users.models import User
+from src.infrastructure.sqlalchemy.courses.models import Course, RunForCourse, RoleForCourse, PeriodForCourse
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
