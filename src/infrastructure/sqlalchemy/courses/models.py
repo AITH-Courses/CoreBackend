@@ -1,6 +1,7 @@
 from __future__ import annotations
-import uuid
+
 import datetime
+import uuid
 
 from sqlalchemy import ForeignKey, Text, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship

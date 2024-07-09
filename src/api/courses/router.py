@@ -1,11 +1,17 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
 
 from src.api.base_schemas import ErrorResponse
 from src.api.courses.dependencies import get_talent_courses_query_service
-from src.api.courses.schemas import CourseShortDTO, CourseFullDTO
+from src.api.courses.schemas import CourseFullDTO, CourseShortDTO
 from src.domain.courses.exceptions import CourseNotFoundError
-from src.services.courses.query_service_for_talent import TalentCourseQueryService
+
+if TYPE_CHECKING:
+    from src.services.courses.query_service_for_talent import TalentCourseQueryService
 
 router = APIRouter(prefix="/courses", tags=["courses"])
 

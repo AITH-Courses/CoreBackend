@@ -1,16 +1,28 @@
-from fastapi import APIRouter, Depends, status, Body, Path
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+from fastapi import APIRouter, Body, Depends, Path, status
 from fastapi.responses import JSONResponse
 
 from src.api.admin.dependencies import get_admin, get_admin_courses_query_service
 from src.api.admin.schemas import CreateCourseRequest, CreateCourseResponse, UpdateCourseRequest
-from src.api.auth.schemas import UserDTO
 from src.api.base_schemas import ErrorResponse, SuccessResponse
 from src.api.courses.dependencies import get_courses_command_service
-from src.api.courses.schemas import CourseShortDTO, CourseFullDTO
-from src.domain.courses.exceptions import CourseNotFoundError, CourseAlreadyExistsError, EmptyPropertyError, \
-    IncorrectCourseRunNameError, ValueDoesntExistError
-from src.services.courses.command_service import CourseCommandService
-from src.services.courses.query_service_for_admin import AdminCourseQueryService
+from src.api.courses.schemas import CourseFullDTO, CourseShortDTO
+from src.domain.courses.exceptions import (
+    CourseAlreadyExistsError,
+    CourseNotFoundError,
+    EmptyPropertyError,
+    IncorrectCourseRunNameError,
+    ValueDoesntExistError,
+)
+
+if TYPE_CHECKING:
+    from src.api.auth.schemas import UserDTO
+    from src.services.courses.command_service import CourseCommandService
+    from src.services.courses.query_service_for_admin import AdminCourseQueryService
+
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
@@ -38,14 +50,14 @@ router = APIRouter(prefix="/admin", tags=["admin"])
 )
 async def create_course(
     data: CreateCourseRequest = Body(),
-    admin: UserDTO = Depends(get_admin),
+    _: UserDTO = Depends(get_admin),
     command_service: CourseCommandService = Depends(get_courses_command_service),
     query_service: AdminCourseQueryService = Depends(get_admin_courses_query_service),
 ) -> JSONResponse:
     """Create course.
 
+    :param _:
     :param query_service:
-    :param admin:
     :param data:
     :param command_service:
     :return:
@@ -98,14 +110,14 @@ async def create_course(
 async def update_course(
     course_id: str = Path(),
     data: UpdateCourseRequest = Body(),
-    admin: UserDTO = Depends(get_admin),
+    _: UserDTO = Depends(get_admin),
     command_service: CourseCommandService = Depends(get_courses_command_service),
     query_service: AdminCourseQueryService = Depends(get_admin_courses_query_service),
 ) -> JSONResponse:
     """Create course.
 
+    :param _:
     :param query_service:
-    :param admin:
     :param course_id:
     :param data:
     :param command_service:
@@ -165,14 +177,14 @@ async def update_course(
 )
 async def delete_course(
     course_id: str = Path(),
-    admin: UserDTO = Depends(get_admin),
+    _: UserDTO = Depends(get_admin),
     command_service: CourseCommandService = Depends(get_courses_command_service),
     query_service: AdminCourseQueryService = Depends(get_admin_courses_query_service),
 ) -> JSONResponse:
     """Create course.
 
+    :param _:
     :param query_service:
-    :param admin:
     :param course_id:
     :param command_service:
     :return:
@@ -211,12 +223,12 @@ async def delete_course(
 )
 async def get_course(
     course_id: str = Path(),
-    admin: UserDTO = Depends(get_admin),
+    _: UserDTO = Depends(get_admin),
     query_service: AdminCourseQueryService = Depends(get_admin_courses_query_service),
 ) -> JSONResponse:
     """Get course.
 
-    :param admin:
+    :param _:
     :param course_id:
     :param query_service:
     :return:
@@ -248,12 +260,12 @@ async def get_course(
     response_model=list[CourseShortDTO],
 )
 async def get_courses(
-    admin: UserDTO = Depends(get_admin),
+    _: UserDTO = Depends(get_admin),
     query_service: AdminCourseQueryService = Depends(get_admin_courses_query_service),
 ) -> list[CourseShortDTO]:
     """Get courses.
 
-    :param admin:
+    :param _:
     :param query_service:
     :return:
     """

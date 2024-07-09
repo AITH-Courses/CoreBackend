@@ -1,7 +1,7 @@
 from fastapi import Depends, Header, HTTPException, status
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from src.api.auth.schemas import UserDTO
 from src.api.base_schemas import ErrorResponse

@@ -1,12 +1,9 @@
-from fastapi import HTTPException, status
-
-from src.api.auth.dependencies import get_user
-from src.api.auth.schemas import UserDTO
-
-from fastapi import Depends
+from fastapi import Depends, HTTPException, status
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.api.auth.dependencies import get_user
+from src.api.auth.schemas import UserDTO
 from src.api.base_schemas import ErrorResponse
 from src.infrastructure.redis.courses.course_cache_service import RedisCourseCacheService
 from src.infrastructure.redis.session import get_redis_session
@@ -18,12 +15,11 @@ from src.services.courses.query_service_for_admin import AdminCourseQueryService
 async def get_admin(
     user: UserDTO = Depends(get_user),
 ) -> UserDTO:
-    """
+    """Get admin.
 
     :param user:
     :return:
     """
-    print(user)
     if user.role != "admin":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,

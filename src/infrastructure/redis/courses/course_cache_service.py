@@ -1,12 +1,16 @@
+from __future__ import annotations
+
 import json
 from json.decoder import JSONDecodeError
-
-from redis.asyncio import Redis
+from typing import TYPE_CHECKING
 
 from src.domain.courses.entities import CourseEntity
-from src.domain.courses.value_objects import CourseName, Author, Implementer, CourseRun, Period, Role, Format, Terms
-from src.infrastructure.redis.courses.constants import TIME_TO_LIVE_ONE_COURSE, TIME_TO_LIVE_ALL_COURSES
+from src.domain.courses.value_objects import Author, CourseName, CourseRun, Format, Implementer, Period, Role, Terms
+from src.infrastructure.redis.courses.constants import TIME_TO_LIVE_ALL_COURSES, TIME_TO_LIVE_ONE_COURSE
 from src.services.courses.course_cache_service import CourseCacheService
+
+if TYPE_CHECKING:
+    from redis.asyncio import Redis
 
 
 COURSES_KEY = "courses"
@@ -80,7 +84,7 @@ class RedisCourseCacheService(CourseCacheService):
     async def set_one(self, course: CourseEntity) -> None:
         course_dict = self.__from_domain_to_dict(course)
         course_data_string = json.dumps(course_dict)
-        await self.session.setex(COURSE_KEY + course.id, 10, course_data_string)
+        await self.session.setex(COURSE_KEY + course.id, TIME_TO_LIVE_ONE_COURSE, course_data_string)
 
     async def get_many(self) -> list[CourseEntity]:
         try:
@@ -96,4 +100,4 @@ class RedisCourseCacheService(CourseCacheService):
     async def set_many(self, courses: list[CourseEntity]) -> None:
         courses_dict = [self.__from_domain_to_dict(course) for course in courses]
         courses_data_string = json.dumps(courses_dict)
-        await self.session.setex(COURSES_KEY, 10, courses_data_string)
+        await self.session.setex(COURSES_KEY, TIME_TO_LIVE_ALL_COURSES, courses_data_string)

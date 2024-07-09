@@ -1,7 +1,11 @@
-from src.domain.courses.course_repository import ICourseRepository
-from src.domain.courses.entities import CourseEntity
-from src.domain.courses.exceptions import CourseNotFoundError
-from src.services.courses.course_cache_service import CourseCacheService
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from src.domain.courses.course_repository import ICourseRepository
+    from src.domain.courses.entities import CourseEntity
+    from src.services.courses.course_cache_service import CourseCacheService
 
 
 class AdminCourseQueryService:

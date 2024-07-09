@@ -5,8 +5,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.infrastructure.redis.courses.course_cache_service import RedisCourseCacheService
 from src.infrastructure.redis.session import get_redis_session
 from src.infrastructure.sqlalchemy.courses.repository import SQLAlchemyCourseRepository
-from src.infrastructure.sqlalchemy.session import get_async_session
 from src.infrastructure.sqlalchemy.courses.unit_of_work import SQLAlchemyCoursesUnitOfWork
+from src.infrastructure.sqlalchemy.session import get_async_session
 from src.services.courses.command_service import CourseCommandService
 from src.services.courses.query_service_for_talent import TalentCourseQueryService
 

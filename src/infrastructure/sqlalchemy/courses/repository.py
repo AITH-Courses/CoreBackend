@@ -1,12 +1,19 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
-from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 
 from src.domain.courses.course_repository import ICourseRepository
-from src.domain.courses.entities import CourseEntity
 from src.domain.courses.exceptions import CourseNotFoundError
 from src.infrastructure.sqlalchemy.courses.models import Course, PeriodForCourse, RoleForCourse, RunForCourse
+
+if TYPE_CHECKING:
+    from sqlalchemy.ext.asyncio import AsyncSession
+
+    from src.domain.courses.entities import CourseEntity
 
 
 class SQLAlchemyCourseRepository(ICourseRepository):

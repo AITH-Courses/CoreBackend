@@ -1,11 +1,16 @@
+from __future__ import annotations
+
 import uuid
+from typing import TYPE_CHECKING
 
 from sqlalchemy.exc import IntegrityError
 
 from src.domain.courses.entities import CourseEntity
 from src.domain.courses.exceptions import CourseAlreadyExistsError, CourseNotFoundError
-from src.domain.courses.value_objects import CourseName, CourseRun, Period, Implementer, Author, Format, Terms, Role
-from src.services.courses.unit_of_work import CoursesUnitOfWork
+from src.domain.courses.value_objects import Author, CourseName, CourseRun, Format, Implementer, Period, Role, Terms
+
+if TYPE_CHECKING:
+    from src.services.courses.unit_of_work import CoursesUnitOfWork
 
 
 class CourseCommandService:
@@ -25,9 +30,9 @@ class CourseCommandService:
         except IntegrityError as ex:
             await self.uow.rollback()
             raise CourseAlreadyExistsError from ex
-        except Exception as ex:
+        except Exception:
             await self.uow.rollback()
-            raise ex
+            raise
         return course_id
 
     async def update_course(
@@ -35,7 +40,7 @@ class CourseCommandService:
             prerequisites_: str | None, description_: str | None, topics_: str | None,
             assessment_: str | None, resources_: str | None, extra_: str | None,
             author_: str | None, implementer_: str | None, format_: str | None,
-            terms_: str | None, roles: list[str], periods: list[str], runs: list[str]
+            terms_: str | None, roles: list[str], periods: list[str], runs: list[str],
     ) -> None:
         course = CourseEntity(
             id=str(course_id),
@@ -62,17 +67,17 @@ class CourseCommandService:
         except IntegrityError as ex:
             await self.uow.rollback()
             raise CourseAlreadyExistsError from ex
-        except CourseNotFoundError as ex:
+        except CourseNotFoundError:
             await self.uow.rollback()
-            raise ex
+            raise
 
     async def delete_course(self, course_id: str) -> None:
         try:
             await self.uow.course_repo.delete(course_id)
             await self.uow.commit()
-        except CourseNotFoundError as ex:
+        except CourseNotFoundError:
             await self.uow.rollback()
-            raise ex
+            raise
 
     async def publish_course(self, course_id: str) -> None:
         try:
@@ -80,9 +85,9 @@ class CourseCommandService:
             course.publish()
             await self.uow.course_repo.update(course)
             await self.uow.commit()
-        except CourseNotFoundError as ex:
+        except CourseNotFoundError:
             await self.uow.rollback()
-            raise ex
+            raise
 
     async def hide_course(self, course_id: str) -> None:
         try:
@@ -90,6 +95,6 @@ class CourseCommandService:
             course.hide()
             await self.uow.course_repo.update(course)
             await self.uow.commit()
-        except CourseNotFoundError as ex:
+        except CourseNotFoundError:
             await self.uow.rollback()
-            raise ex
+            raise
