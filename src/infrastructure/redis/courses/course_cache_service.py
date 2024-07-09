@@ -80,7 +80,7 @@ class RedisCourseCacheService(CourseCacheService):
     async def set_one(self, course: CourseEntity) -> None:
         course_dict = self.__from_domain_to_dict(course)
         course_data_string = json.dumps(course_dict)
-        await self.session.set(COURSE_KEY + course.id, course_data_string, keepttl=TIME_TO_LIVE_ONE_COURSE)
+        await self.session.setex(COURSE_KEY + course.id, 10, course_data_string)
 
     async def get_many(self) -> list[CourseEntity]:
         try:
@@ -96,4 +96,4 @@ class RedisCourseCacheService(CourseCacheService):
     async def set_many(self, courses: list[CourseEntity]) -> None:
         courses_dict = [self.__from_domain_to_dict(course) for course in courses]
         courses_data_string = json.dumps(courses_dict)
-        await self.session.set(COURSES_KEY, courses_data_string, keepttl=TIME_TO_LIVE_ALL_COURSES)
+        await self.session.setex(COURSES_KEY, 10, courses_data_string)

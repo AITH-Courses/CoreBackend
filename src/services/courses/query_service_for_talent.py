@@ -14,7 +14,7 @@ class TalentCourseQueryService:
 
     async def get_course(self, course_id: str) -> CourseEntity:
         course_from_cache = await self.course_cache_service.get_one(course_id)
-        if course_from_cache:
+        if course_from_cache and not course_from_cache.is_draft:
             return course_from_cache
         course = await self.course_repo.get_by_id(course_id)
         if course.is_draft:
@@ -25,7 +25,7 @@ class TalentCourseQueryService:
     async def get_courses(self) -> list[CourseEntity]:
         courses_from_cache = await self.course_cache_service.get_many()
         if courses_from_cache:
-            return courses_from_cache
+            return [course for course in courses_from_cache if not course.is_draft]
         courses = await self.course_repo.get_all()
         courses = [course for course in courses if not course.is_draft]
         await self.course_cache_service.set_many(courses)
