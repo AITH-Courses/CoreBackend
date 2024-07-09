@@ -74,3 +74,15 @@ class SQLAlchemyCourseRepository(ICourseRepository):
             return result.unique().scalars().one()
         except NoResultFound as ex:
             raise CourseNotFoundError from ex
+
+    async def get_all(self) -> list[CourseEntity]:
+        query = (
+            select(Course)
+            .options(joinedload(Course.roles))
+            .options(joinedload(Course.periods))
+            .options(joinedload(Course.runs))
+            .filter_by(is_archive=False)
+        )
+        result = await self.session.execute(query)
+        courses = result.unique().scalars().all()
+        return [course.to_domain() for course in courses]

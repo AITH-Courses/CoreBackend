@@ -55,3 +55,12 @@ class CourseNotFoundError(DomainError):
     @property
     def message(self) -> str:
         return "Course is not found"
+
+
+class CourseAlreadyExistsError(DomainError):
+
+    """Course with this name already exists."""
+
+    @property
+    def message(self) -> str:
+        return "Course with this name already exists"

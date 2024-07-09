@@ -22,3 +22,7 @@ class ICourseRepository(ABC):
     @abstractmethod
     async def get_by_id(self, course_id: str) -> CourseEntity:
         raise NotImplementedError
+
+    @abstractmethod
+    async def get_all(self) -> list[CourseEntity]:
+        raise NotImplementedError

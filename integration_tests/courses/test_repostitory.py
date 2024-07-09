@@ -32,6 +32,18 @@ async def test_create_course(test_async_session: AsyncSession):
     assert len(course.last_runs) == 0
 
 
+async def test_get_many_courses(test_async_session: AsyncSession):
+    course_id, repo = await create_course(test_async_session)
+    courses = await repo.get_all()
+    assert len(courses) == 1
+    assert courses[0].id == course_id
+    assert courses[0].name == CourseName("Алгоритмизация")
+    assert courses[0].image_url is None
+    assert len(courses[0].roles) == 0
+    assert len(courses[0].periods) == 0
+    assert len(courses[0].last_runs) == 0
+
+
 async def test_update_course(test_async_session: AsyncSession):
     course_id, repo = await create_course(test_async_session)
     update_course = CourseEntity(
