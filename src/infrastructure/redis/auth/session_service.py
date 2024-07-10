@@ -22,10 +22,10 @@ class RedisSessionService(SessionService):
         user_dict = {
             "id": user.id,
             "firstname": user.firstname.value,
-            "lastname" : user.lastname.value,
+            "lastname": user.lastname.value,
             "role": user.role.value,
-            "email" :user.email.value,
-            "hashed_password":user.hashed_password,
+            "email": user.email.value,
+            "hashed_password": user.hashed_password,
         }
         return json.dumps(user_dict)
 
@@ -51,7 +51,7 @@ class RedisSessionService(SessionService):
 
     async def set(self, auth_token: str, user: UserEntity) -> None:
         user_data_string = self.from_domain_to_json_string(user)
-        await self.session.set(auth_token, user_data_string, keepttl=TIME_TO_LIVE_AUTH_SESSION)
+        await self.session.setex(auth_token, TIME_TO_LIVE_AUTH_SESSION, user_data_string)
 
     async def delete(self, auth_token: str) -> None:
         await self.session.delete(auth_token)

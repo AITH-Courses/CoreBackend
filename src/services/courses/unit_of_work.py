@@ -1,13 +1,15 @@
 from abc import ABC, abstractmethod
 
 from src.domain.auth.user_repository import IUserRepository
+from src.domain.courses.course_repository import ICourseRepository
 
 
-class AuthUnitOfWork(ABC):
+class CoursesUnitOfWork(ABC):
 
     """Base class implemented pattern Unit of Work."""
 
     user_repo: IUserRepository
+    course_repo: ICourseRepository
 
     @abstractmethod
     async def begin(self) -> None:

@@ -1,11 +1,10 @@
 from abc import ABC, abstractmethod
-from uuid import UUID
 
 from src.domain.auth.entities import UserEntity
 from src.domain.auth.value_objects import Email
 
 
-class UserRepository(ABC):
+class IUserRepository(ABC):
 
     """Interface of Repository for User."""
 
@@ -18,11 +17,11 @@ class UserRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def delete(self, user_id: UUID) -> None:
+    async def delete(self, user_id: str) -> None:
         raise NotImplementedError
 
     @abstractmethod
-    async def get_by_id(self, user_id: UUID) -> UserEntity:
+    async def get_by_id(self, user_id: str) -> UserEntity:
         raise NotImplementedError
 
     @abstractmethod
