@@ -24,7 +24,6 @@ class UpdateCourseRequest(BaseModel):
     name: str = Field("NoSQL")
     image_url: str | None = Field("image/path-to-file.png")
     limits: int | None = Field(25)
-    is_draft: bool = Field(default=True)
 
     prerequisites: str | None = Field("SQL, Basic RDBMS")
     description: str | None = Field("Information about NoSQL")

@@ -13,6 +13,7 @@ from src.api.courses.schemas import CourseFullDTO, CourseShortDTO
 from src.domain.courses.exceptions import (
     CourseAlreadyExistsError,
     CourseNotFoundError,
+    CoursePublishError,
     EmptyPropertyError,
     IncorrectCourseRunNameError,
     ValueDoesntExistError,
@@ -272,3 +273,112 @@ async def get_courses(
     courses = await query_service.get_courses()
     return [CourseShortDTO.from_domain(course) for course in courses]
 
+
+@router.post(
+    "/courses/{course_id}/published",
+    status_code=status.HTTP_200_OK,
+    description="Publish course",
+    summary="Publish course",
+    responses={
+        status.HTTP_200_OK: {
+            "model": SuccessResponse,
+            "description": "Course published",
+        },
+        status.HTTP_404_NOT_FOUND: {
+            "model": ErrorResponse,
+            "description": "No course",
+        },
+        status.HTTP_409_CONFLICT: {
+            "model": ErrorResponse,
+            "description": "No course",
+        },
+    },
+    response_model=SuccessResponse,
+)
+async def publish_course(
+    course_id: str = Path(),
+    _: UserDTO = Depends(get_admin),
+    command_service: CourseCommandService = Depends(get_courses_command_service),
+    query_service: AdminCourseQueryService = Depends(get_admin_courses_query_service),
+) -> JSONResponse:
+    """Publish course.
+
+    :param _:
+    :param query_service:
+    :param course_id:
+    :param command_service:
+    :return:
+    """
+    try:
+        await command_service.publish_course(course_id)
+        await query_service.course_cache_service.delete_one(course_id)
+        await query_service.course_cache_service.delete_many()
+        return JSONResponse(
+            content=SuccessResponse(message="Course has published").model_dump(),
+            status_code=status.HTTP_200_OK,
+        )
+    except CourseNotFoundError as ex:
+        return JSONResponse(
+            content=ErrorResponse(message=ex.message).model_dump(),
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+    except CoursePublishError as ex:
+        return JSONResponse(
+            content=ErrorResponse(message=ex.message).model_dump(),
+            status_code=status.HTTP_409_CONFLICT,
+        )
+
+
+@router.delete(
+    "/courses/{course_id}/published",
+    status_code=status.HTTP_200_OK,
+    description="Hide course",
+    summary="Hide course",
+    responses={
+        status.HTTP_200_OK: {
+            "model": SuccessResponse,
+            "description": "Course unpublished",
+        },
+        status.HTTP_404_NOT_FOUND: {
+            "model": ErrorResponse,
+            "description": "No course",
+        },
+        status.HTTP_409_CONFLICT: {
+            "model": ErrorResponse,
+            "description": "No course",
+        },
+    },
+    response_model=SuccessResponse,
+)
+async def hide_course(
+    course_id: str = Path(),
+    _: UserDTO = Depends(get_admin),
+    command_service: CourseCommandService = Depends(get_courses_command_service),
+    query_service: AdminCourseQueryService = Depends(get_admin_courses_query_service),
+) -> JSONResponse:
+    """Hide/unpublish course.
+
+    :param _:
+    :param query_service:
+    :param course_id:
+    :param command_service:
+    :return:
+    """
+    try:
+        await command_service.hide_course(course_id)
+        await query_service.course_cache_service.delete_one(course_id)
+        await query_service.course_cache_service.delete_many()
+        return JSONResponse(
+            content=SuccessResponse(message="Course has unpublished").model_dump(),
+            status_code=status.HTTP_200_OK,
+        )
+    except CourseNotFoundError as ex:
+        return JSONResponse(
+            content=ErrorResponse(message=ex.message).model_dump(),
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+    except CoursePublishError as ex:
+        return JSONResponse(
+            content=ErrorResponse(message=ex.message).model_dump(),
+            status_code=status.HTTP_409_CONFLICT,
+        )

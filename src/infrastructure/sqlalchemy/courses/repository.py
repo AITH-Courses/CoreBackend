@@ -32,6 +32,7 @@ class SQLAlchemyCourseRepository(ICourseRepository):
         course_.name = course.name.value
         course_.image_url = course.image_url
         course_.limits = course.limits
+        course_.is_draft = course.is_draft
         course_.prerequisites = course.prerequisites
         course_.description = course.description
         course_.topics = course.topics

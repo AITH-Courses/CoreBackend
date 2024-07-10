@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from src.api.admin.router import router as admin_router
+from src.api.admin.course_router import router as admin_course_router
 from src.api.auth.router import router as auth_router
 from src.api.courses.router import router as course_router
 from src.api.health_check import router as health_check_router
@@ -41,7 +41,7 @@ def add_routers(application: FastAPI) -> None:
     application.include_router(router=health_check_router)
     application.include_router(router=auth_router)
     application.include_router(router=course_router)
-    application.include_router(router=admin_router)
+    application.include_router(router=admin_course_router)
 
 
 def add_cors(application: FastAPI) -> None:
