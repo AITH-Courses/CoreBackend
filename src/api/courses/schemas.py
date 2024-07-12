@@ -69,6 +69,7 @@ class CourseShortDTO(BaseModel):
     image_url: str | None = Field("image/path-to-file.png")
     is_draft: bool = Field(default=True)
     implementer: str | None = Field("ИПКН")
+    format: str | None = Field("online-курс")
     roles: list[str] = Field(["AI Product Manager"])
     last_runs: list[str] = Field(["Весна 2023"])
 
@@ -84,3 +85,11 @@ class CourseShortDTO(BaseModel):
             roles=[role.value for role in course.roles],
             last_runs=[run.value for run in course.last_runs],
         )
+
+
+class CoursesPaginationResponse(BaseModel):
+
+    """Schema of courses pagination."""
+
+    courses: list[CourseShortDTO]
+    max_page: int
