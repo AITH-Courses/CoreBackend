@@ -34,8 +34,8 @@ class UpdateCourseRequest(BaseModel):
 
     author: str | None = Field("Иванов И. И.")
     implementer: str | None = Field("ИПКН")
-    format: str | None = Field("онлайн-курс")
+    format: str | None = Field("online-курс")
     terms: str | None = Field("1, 3")
     roles: list[str] = Field(["AI Product Manager"])
-    periods: list[str] = Field(["Сентябрь", "Октябрь"])
+    periods: list[str] = Field(["сентябрь", "октябрь"])
     last_runs: list[str] = Field(["Весна 2023"])
