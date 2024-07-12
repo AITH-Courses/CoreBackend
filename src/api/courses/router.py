@@ -73,7 +73,7 @@ async def get_courses(
 
 
 @router.get(
-    "/{model_id}",
+    "/{course_id}",
     status_code=status.HTTP_200_OK,
     description="Get full information about course",
     summary="Get course",
@@ -103,7 +103,7 @@ async def get_course(
         course = await query_service.get_course(course_id)
         return JSONResponse(
             content=CourseFullDTO.from_domain(course).model_dump(),
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_200_OK,
         )
     except CourseNotFoundError as ex:
         return JSONResponse(
