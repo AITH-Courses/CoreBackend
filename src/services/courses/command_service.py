@@ -83,7 +83,7 @@ class CourseCommandService:
         try:
             course = await self.uow.course_repo.get_by_id(course_id)
             course.publish()
-            await self.uow.course_repo.update(course)
+            await self.uow.course_repo.update_draft_status(course)
             await self.uow.commit()
         except CourseNotFoundError:
             await self.uow.rollback()
@@ -93,7 +93,7 @@ class CourseCommandService:
         try:
             course = await self.uow.course_repo.get_by_id(course_id)
             course.hide()
-            await self.uow.course_repo.update(course)
+            await self.uow.course_repo.update_draft_status(course)
             await self.uow.commit()
         except CourseNotFoundError:
             await self.uow.rollback()

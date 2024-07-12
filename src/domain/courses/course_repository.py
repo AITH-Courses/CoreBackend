@@ -7,7 +7,6 @@ if TYPE_CHECKING:
     from src.domain.courses.entities import CourseEntity
 
 
-
 class ICourseRepository(ABC):
 
     """Interface of Repository for Course."""
@@ -18,6 +17,10 @@ class ICourseRepository(ABC):
 
     @abstractmethod
     async def update(self, course: CourseEntity) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def update_draft_status(self, course: CourseEntity) -> None:
         raise NotImplementedError
 
     @abstractmethod

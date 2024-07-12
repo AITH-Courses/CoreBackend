@@ -32,7 +32,6 @@ class SQLAlchemyCourseRepository(ICourseRepository):
         course_.name = course.name.value
         course_.image_url = course.image_url
         course_.limits = course.limits
-        course_.is_draft = course.is_draft
         course_.prerequisites = course.prerequisites
         course_.description = course.description
         course_.topics = course.topics
@@ -56,6 +55,10 @@ class SQLAlchemyCourseRepository(ICourseRepository):
         course_.roles = [RoleForCourse(course_id=course.id, role_name=role.value) for role in course.roles]
         course_.periods = [PeriodForCourse(course_id=course.id, period_name=period.value) for period in course.periods]
         course_.runs = [RunForCourse(course_id=course.id, run_name=run.value) for run in course.last_runs]
+
+    async def update_draft_status(self, course: CourseEntity) -> None:
+        course_ = await self.__get_by_id(course.id)
+        course_.is_draft = course.is_draft
 
     async def delete(self, course_id: str) -> None:
         course_ = await self.__get_by_id(course_id)
