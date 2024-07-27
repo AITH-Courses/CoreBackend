@@ -1,5 +1,5 @@
 import datetime
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 from src.domain.feedback.exceptions import FeedbackLikeError
 from src.domain.feedback.value_objects import Vote, FeedbackText
@@ -14,8 +14,8 @@ class FeedbackEntity:
     course_id: str
     author_id: str
     text: FeedbackText
-    votes: set[Vote]
-    date: datetime.date
+    votes: set[Vote] = field(default_factory=list)
+    date: datetime.date = field(default_factory=datetime.date.today)
 
     def unvote(self, user_id: str, vote_type: str) -> None:
         vote = Vote(user_id, vote_type)

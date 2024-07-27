@@ -13,3 +13,12 @@ class FeedbackLikeError(DomainError):
     @property
     def message(self) -> str:
         return self.error_message
+
+
+class FeedbackNotFoundError(DomainError):
+
+    """Feedback is not found."""
+
+    @property
+    def message(self) -> str:
+        return "Отзыв не найден"

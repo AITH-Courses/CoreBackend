@@ -20,6 +20,10 @@ class IFeedbackRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
+    async def update_votes(self, feedback: FeedbackEntity) -> None:
+        raise NotImplementedError
+
+    @abstractmethod
     async def get_one_by_id(self, feedback_id: str) -> FeedbackEntity:
         raise NotImplementedError
 
