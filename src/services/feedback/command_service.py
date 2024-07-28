@@ -4,7 +4,7 @@ import uuid
 from typing import TYPE_CHECKING
 
 from src.domain.feedback.entities import FeedbackEntity
-from src.domain.feedback.exceptions import FeedbackNotFoundError
+from src.domain.feedback.exceptions import FeedbackNotFoundError, FeedbackBelongsToAnotherUserError
 from src.domain.feedback.value_objects import FeedbackText
 
 if TYPE_CHECKING:
@@ -50,8 +50,11 @@ class FeedbackCommandService:
             await self.uow.rollback()
             raise
 
-    async def delete_feedback(self, feedback_id: str) -> None:
+    async def delete_feedback(self, feedback_id: str, user_id: str) -> None:
         try:
+            feedback = await self.uow.feedback_repo.get_one_by_id(feedback_id)
+            if feedback.author_id != user_id:
+                raise FeedbackBelongsToAnotherUserError
             await self.uow.feedback_repo.delete(feedback_id)
             await self.uow.commit()
         except FeedbackNotFoundError:

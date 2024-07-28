@@ -22,3 +22,12 @@ class FeedbackNotFoundError(DomainError):
     @property
     def message(self) -> str:
         return "Отзыв не найден"
+
+
+class FeedbackBelongsToAnotherUserError(DomainError):
+
+    """Feedback belongs to another author."""
+
+    @property
+    def message(self) -> str:
+        return "Для удаления отзыва требуется быть его автором"
