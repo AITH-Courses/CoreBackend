@@ -66,3 +66,35 @@ async def get_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=ErrorResponse(message="You need to login to your account").model_dump(),
         ) from ex
+
+
+async def get_user_or_anonym(
+        credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer(auto_error=False)),
+        auth_service: AuthCommandService = Depends(get_auth_service),
+) -> UserDTO:
+    """Get user on auth token or anonym.
+
+    :param credentials:
+    :param auth_service:
+    :return:
+    """
+    anonym = UserDTO(
+        id="anonym",
+        firstname="anonym",
+        lastname="anonym",
+        email="anonym",
+        role="anonym",
+    )
+    try:
+        if not credentials:
+            return anonym
+        user = await auth_service.me(credentials.credentials)
+        return UserDTO(
+            id=user.id,
+            firstname=user.firstname.value,
+            lastname=user.lastname.value,
+            email=user.email.value,
+            role=user.role.value,
+        )
+    except UserBySessionNotFoundError:
+        return anonym
