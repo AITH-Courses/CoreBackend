@@ -19,11 +19,11 @@ class FeedbackEntity:
     votes: set[Vote] = field(default_factory=list)
     date: datetime.date = field(default_factory=datetime.date.today)
 
-    def unvote(self, user_id: str, vote_type: str) -> None:
-        vote = Vote(user_id, vote_type)
-        if vote not in self.votes:
-            raise FeedbackLikeError(error_message="Невозможно отменить оценку для неоцененного отзыва")
-        self.votes.remove(vote)
+    def unvote(self, user_id: str) -> None:
+        vote = Vote(user_id, "like")
+        alternative_vote = Vote(user_id, "dislike")
+        self.votes.discard(vote)
+        self.votes.discard(alternative_vote)
 
     def vote(self, user_id: str, vote_type: str) -> None:
         alternative_vote_type = "dislike" if vote_type == "like" else "like"

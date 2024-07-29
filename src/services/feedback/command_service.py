@@ -40,10 +40,10 @@ class FeedbackCommandService:
             await self.uow.rollback()
             raise
 
-    async def unvote(self, feedback_id: str, user_id: str, vote_type: str) -> None:
+    async def unvote(self, feedback_id: str, user_id: str) -> None:
         try:
             feedback = await self.uow.feedback_repo.get_one_by_id(feedback_id)
-            feedback.unvote(user_id, vote_type)
+            feedback.unvote(user_id)
             await self.uow.feedback_repo.update_votes(feedback)
             await self.uow.commit()
         except FeedbackNotFoundError:

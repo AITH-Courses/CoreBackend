@@ -103,8 +103,8 @@ async def create_feedback(
     summary="Delete feedback",
     responses={
         status.HTTP_200_OK: {
-            "model": list[FeedbackDTO],
-            "description": "Feedbacks for one course",
+            "model": SuccessResponse,
+            "description": "Feedback has been deleted",
         },
         status.HTTP_403_FORBIDDEN: {
             "model": ErrorResponse,
@@ -181,7 +181,6 @@ async def delete_feedback(
 async def unvote_feedback(
     course_id: str,
     feedback_id: str,
-    data: VoteDTO = Body(),
     user: UserDTO = Depends(get_user),
     command_service:  FeedbackCommandService = Depends(get_feedback_command_service),
     query_service:  FeedbackQueryService = Depends(get_feedback_query_service),
@@ -190,14 +189,13 @@ async def unvote_feedback(
 
     :param course_id:
     :param feedback_id:
-    :param data:
     :param user:
     :param command_service:
     :param query_service:
     :return:
     """
     try:
-        await command_service.unvote(feedback_id, user.id, data.vote_type)
+        await command_service.unvote(feedback_id, user.id)
         await query_service.feedback_cache_service.delete_many(course_id)
         return JSONResponse(
             content=SuccessResponse(message="Оценка с отзыва убрана").model_dump(),
