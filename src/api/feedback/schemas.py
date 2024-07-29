@@ -1,17 +1,17 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 from src.domain.feedback.entities import FeedbackEntity
 from src.domain.feedback.value_objects import Vote
 
 
 class FeedbackDTO(BaseModel):
-    id: str
-    text: str
-    is_author: bool
-    liked_by_user: bool
-    disliked_by_user: bool
-    date: str
-    reputation: int
+    id: str = Field("c5a4bfb7-0349-4d07-b6d8-b21c8777602b")
+    text: str = Field("Cool course!")
+    is_author: bool = Field(False)
+    liked_by_user: bool = Field(True)
+    disliked_by_user: bool = Field(False)
+    date: str = Field("2024-09-24")
+    reputation: int = Field(3)
 
     @staticmethod
     def from_domain(feedback: FeedbackEntity, user_id: str):
@@ -27,8 +27,12 @@ class FeedbackDTO(BaseModel):
 
 
 class CreateFeedbackDTO(BaseModel):
-    text: str
+    text: str = Field("Cool course!")
 
 
 class CreateFeedbackResponse(BaseModel):
-    feedback_id: str
+    feedback_id: str = Field("c5a4bfb7-0349-4d07-b6d8-b21c8777602b")
+
+
+class VoteDTO(BaseModel):
+    vote_type: str = Field("like")

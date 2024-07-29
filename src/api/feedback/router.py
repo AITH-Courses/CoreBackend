@@ -10,9 +10,9 @@ from src.api.auth.schemas import UserDTO
 from src.api.base_pagination import PaginationError, Paginator
 from src.api.base_schemas import ErrorResponse, SuccessResponse
 from src.api.feedback.dependencies import get_feedback_query_service, get_feedback_command_service
-from src.api.feedback.schemas import FeedbackDTO, CreateFeedbackDTO, CreateFeedbackResponse
-from src.domain.courses.exceptions import EmptyPropertyError
-from src.domain.feedback.exceptions import FeedbackNotFoundError, FeedbackBelongsToAnotherUserError
+from src.api.feedback.schemas import FeedbackDTO, CreateFeedbackDTO, CreateFeedbackResponse, VoteDTO
+from src.domain.courses.exceptions import EmptyPropertyError, ValueDoesntExistError
+from src.domain.feedback.exceptions import FeedbackNotFoundError, FeedbackBelongsToAnotherUserError, FeedbackLikeError
 from src.services.feedback.command_service import FeedbackCommandService
 
 if TYPE_CHECKING:
@@ -65,7 +65,7 @@ async def get_feedbacks(
             "description": "Error",
         },
     },
-    response_model=list[FeedbackDTO],
+    response_model=CreateFeedbackResponse,
 )
 async def create_feedback(
     course_id: str,
@@ -116,7 +116,7 @@ async def create_feedback(
             "description": "Error",
         },
     },
-    response_model=list[FeedbackDTO],
+    response_model=SuccessResponse,
 )
 async def delete_feedback(
     course_id: str,
@@ -151,4 +151,138 @@ async def delete_feedback(
         return JSONResponse(
             content=ErrorResponse(message=ex.message).model_dump(),
             status_code=status.HTTP_403_FORBIDDEN,
+        )
+
+
+@router.delete(
+    "/{course_id}/feedbacks/{feedback_id}/vote",
+    status_code=status.HTTP_200_OK,
+    description="Unvote feedback for course",
+    summary="Unvote feedback",
+    responses={
+        status.HTTP_200_OK: {
+            "model": list[FeedbackDTO],
+            "description": "Feedback loss estimating",
+        },
+        status.HTTP_400_BAD_REQUEST: {
+            "model": ErrorResponse,
+            "description": "Error",
+        },
+        status.HTTP_404_NOT_FOUND: {
+            "model": ErrorResponse,
+            "description": "Error",
+        },
+        status.HTTP_422_UNPROCESSABLE_ENTITY: {
+            "model": ErrorResponse,
+            "description": "Error",
+        },
+    },
+    response_model=SuccessResponse,
+)
+async def unvote_feedback(
+    course_id: str,
+    feedback_id: str,
+    data: VoteDTO = Body(),
+    user: UserDTO = Depends(get_user),
+    command_service:  FeedbackCommandService = Depends(get_feedback_command_service),
+    query_service:  FeedbackQueryService = Depends(get_feedback_query_service),
+) -> JSONResponse:
+    """Unvote feedback.
+
+    :param course_id:
+    :param feedback_id:
+    :param data:
+    :param user:
+    :param command_service:
+    :param query_service:
+    :return:
+    """
+    try:
+        await command_service.unvote(feedback_id, user.id, data.vote_type)
+        await query_service.feedback_cache_service.delete_many(course_id)
+        return JSONResponse(
+            content=SuccessResponse(message="Оценка с отзыва убрана").model_dump(),
+            status_code=status.HTTP_200_OK,
+        )
+    except FeedbackNotFoundError as ex:
+        return JSONResponse(
+            content=ErrorResponse(message=ex.message).model_dump(),
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+    except FeedbackLikeError as ex:
+        return JSONResponse(
+            content=ErrorResponse(message=ex.message).model_dump(),
+            status_code=status.HTTP_400_BAD_REQUEST,
+        )
+    except ValueDoesntExistError as ex:
+        return JSONResponse(
+            content=ErrorResponse(message=ex.message).model_dump(),
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        )
+
+
+@router.post(
+    "/{course_id}/feedbacks/{feedback_id}/vote",
+    status_code=status.HTTP_201_CREATED,
+    description="Vote feedback for course",
+    summary="Vote feedback",
+    responses={
+        status.HTTP_201_CREATED: {
+            "model": SuccessResponse,
+            "description": "Feedback is rated",
+        },
+        status.HTTP_400_BAD_REQUEST: {
+            "model": ErrorResponse,
+            "description": "Error",
+        },
+        status.HTTP_404_NOT_FOUND: {
+            "model": ErrorResponse,
+            "description": "Error",
+        },
+        status.HTTP_422_UNPROCESSABLE_ENTITY: {
+            "model": ErrorResponse,
+            "description": "Error",
+        },
+    },
+    response_model=SuccessResponse,
+)
+async def vote_feedback(
+    course_id: str,
+    feedback_id: str,
+    data: VoteDTO = Body(),
+    user: UserDTO = Depends(get_user),
+    command_service:  FeedbackCommandService = Depends(get_feedback_command_service),
+    query_service:  FeedbackQueryService = Depends(get_feedback_query_service),
+) -> JSONResponse:
+    """Add vote for feedback.
+
+    :param course_id:
+    :param feedback_id:
+    :param data:
+    :param user:
+    :param command_service:
+    :param query_service:
+    :return:
+    """
+    try:
+        await command_service.vote(feedback_id, user.id, data.vote_type)
+        await query_service.feedback_cache_service.delete_many(course_id)
+        return JSONResponse(
+            content=SuccessResponse(message="Оценка отзыва выполнена").model_dump(),
+            status_code=status.HTTP_200_OK,
+        )
+    except FeedbackNotFoundError as ex:
+        return JSONResponse(
+            content=ErrorResponse(message=ex.message).model_dump(),
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+    except FeedbackLikeError as ex:
+        return JSONResponse(
+            content=ErrorResponse(message=ex.message).model_dump(),
+            status_code=status.HTTP_400_BAD_REQUEST,
+        )
+    except ValueDoesntExistError as ex:
+        return JSONResponse(
+            content=ErrorResponse(message=ex.message).model_dump(),
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
