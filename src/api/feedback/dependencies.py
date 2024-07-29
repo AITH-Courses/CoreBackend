@@ -4,11 +4,11 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.infrastructure.redis.feedback.feedback_cache_service import RedisFeedbackCacheService
 from src.infrastructure.redis.session import get_redis_session
+from src.infrastructure.sqlalchemy.feedback.repository import SQLAlchemyFeedbackRepository
 from src.infrastructure.sqlalchemy.feedback.unit_of_work import SQLAlchemyFeedbackUnitOfWork
 from src.infrastructure.sqlalchemy.session import get_async_session
 from src.services.feedback.command_service import FeedbackCommandService
 from src.services.feedback.query_service import FeedbackQueryService
-from src.infrastructure.sqlalchemy.feedback.repository import SQLAlchemyFeedbackRepository
 
 
 def get_feedback_query_service(

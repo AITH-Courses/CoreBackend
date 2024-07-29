@@ -4,7 +4,7 @@ import uuid
 from typing import TYPE_CHECKING
 
 from src.domain.feedback.entities import FeedbackEntity
-from src.domain.feedback.exceptions import FeedbackNotFoundError, FeedbackBelongsToAnotherUserError
+from src.domain.feedback.exceptions import FeedbackBelongsToAnotherUserError, FeedbackNotFoundError
 from src.domain.feedback.value_objects import FeedbackText
 
 if TYPE_CHECKING:

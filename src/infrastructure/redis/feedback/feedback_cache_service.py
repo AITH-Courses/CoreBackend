@@ -32,7 +32,7 @@ class RedisFeedbackCacheService(FeedbackCacheService):
             "course_id": feedback.course_id,
             "author_id": feedback.author_id,
             "text": feedback.text.value,
-            "votes": [dict(user_id=vote.user_id, vote_type=vote.vote_type) for vote in feedback.votes],
+            "votes": [{"user_id": vote.user_id, "vote_type": vote.vote_type} for vote in feedback.votes],
             "date": feedback.date.strftime("%Y-%m-%d"),
         }
 
@@ -44,7 +44,7 @@ class RedisFeedbackCacheService(FeedbackCacheService):
             author_id=feedback_["author_id"],
             text=FeedbackText(feedback_["text"]),
             votes={Vote(vote["user_id"], vote["vote_type"]) for vote in feedback_["votes"]},
-            date=datetime.date.fromisoformat(feedback_["date"])
+            date=datetime.date.fromisoformat(feedback_["date"]),
         )
 
     async def get_many_by_course_id(self, course_id: str) -> list[FeedbackEntity]:

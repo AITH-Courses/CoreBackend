@@ -2,20 +2,19 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from fastapi import APIRouter, Depends, Query, status, Body
+from fastapi import APIRouter, Body, Depends, status
 from fastapi.responses import JSONResponse
 
 from src.api.auth.dependencies import get_user, get_user_or_anonym
-from src.api.auth.schemas import UserDTO
-from src.api.base_pagination import PaginationError, Paginator
 from src.api.base_schemas import ErrorResponse, SuccessResponse
-from src.api.feedback.dependencies import get_feedback_query_service, get_feedback_command_service
-from src.api.feedback.schemas import FeedbackDTO, CreateFeedbackDTO, CreateFeedbackResponse, VoteDTO
+from src.api.feedback.dependencies import get_feedback_command_service, get_feedback_query_service
+from src.api.feedback.schemas import CreateFeedbackRequest, CreateFeedbackResponse, FeedbackDTO, VoteDTO
 from src.domain.courses.exceptions import EmptyPropertyError, ValueDoesntExistError
-from src.domain.feedback.exceptions import FeedbackNotFoundError, FeedbackBelongsToAnotherUserError, FeedbackLikeError
-from src.services.feedback.command_service import FeedbackCommandService
+from src.domain.feedback.exceptions import FeedbackBelongsToAnotherUserError, FeedbackLikeError, FeedbackNotFoundError
 
 if TYPE_CHECKING:
+    from src.api.auth.schemas import UserDTO
+    from src.services.feedback.command_service import FeedbackCommandService
     from src.services.feedback.query_service import FeedbackQueryService
 
 router = APIRouter(prefix="/courses", tags=["courses"])
@@ -69,7 +68,7 @@ async def get_feedbacks(
 )
 async def create_feedback(
     course_id: str,
-    data: CreateFeedbackDTO = Body(),
+    data: CreateFeedbackRequest = Body(),
     user: UserDTO = Depends(get_user),
     command_service:  FeedbackCommandService = Depends(get_feedback_command_service),
     query_service:  FeedbackQueryService = Depends(get_feedback_query_service),

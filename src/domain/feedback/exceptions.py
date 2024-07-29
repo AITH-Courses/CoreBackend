@@ -30,4 +30,4 @@ class FeedbackBelongsToAnotherUserError(DomainError):
 
     @property
     def message(self) -> str:
-        return "Для удаления отзыва требуется быть его автором"
+        return "Для удаления отзыва требуется быть автором"

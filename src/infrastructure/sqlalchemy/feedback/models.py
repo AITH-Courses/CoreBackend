@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import uuid
 
-from sqlalchemy import ForeignKey, Text, text, Date
+from sqlalchemy import Date, ForeignKey, Text, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.domain.feedback.entities import FeedbackEntity
@@ -44,7 +44,11 @@ class Feedback(Base):
             content=feedback.text.value,
             date=feedback.date,
             votes=[
-                VoteForFeedback(feedback_id=uuid.UUID(feedback.id), user_id=uuid.UUID(vote.user_id), vote_type=vote.vote_type)
+                VoteForFeedback(
+                    feedback_id=uuid.UUID(feedback.id),
+                    user_id=uuid.UUID(vote.user_id),
+                    vote_type=vote.vote_type,
+                )
                 for vote in feedback.votes
             ],
         )
@@ -79,5 +83,5 @@ class VoteForFeedback(Base):
         return VoteForFeedback(
            feedback_id=uuid.UUID(feedback_id),
            user_id=uuid.UUID(vote.user_id),
-           vote_type=vote.vote_type
+           vote_type=vote.vote_type,
         )

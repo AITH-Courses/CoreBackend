@@ -6,13 +6,14 @@ from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import joinedload
 
-from src.domain.feedback.entities import FeedbackEntity
 from src.domain.feedback.exceptions import FeedbackNotFoundError
 from src.domain.feedback.feedback_repository import IFeedbackRepository
 from src.infrastructure.sqlalchemy.feedback.models import Feedback, VoteForFeedback
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
+
+    from src.domain.feedback.entities import FeedbackEntity
 
 
 class SQLAlchemyFeedbackRepository(IFeedbackRepository):

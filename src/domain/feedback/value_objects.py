@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from src.domain.courses.exceptions import ValueDoesntExistError, EmptyPropertyError
+from src.domain.courses.exceptions import EmptyPropertyError, ValueDoesntExistError
 from src.domain.feedback.contants import VOTE_TYPES
 
 
@@ -13,9 +13,7 @@ class Vote:
     vote_type: str
 
     def __init__(self, user_id: str, vote_type: str) -> None:
-
         """Initialize object."""
-
         if vote_type not in VOTE_TYPES:
             raise ValueDoesntExistError(property_name="vote type")
         object.__setattr__(self, "user_id", user_id)

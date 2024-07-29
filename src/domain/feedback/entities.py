@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 import datetime
 from dataclasses import dataclass, field
 
 from src.domain.feedback.exceptions import FeedbackLikeError
-from src.domain.feedback.value_objects import Vote, FeedbackText
+from src.domain.feedback.value_objects import FeedbackText, Vote
 
 
 @dataclass
@@ -29,9 +31,9 @@ class FeedbackEntity:
         vote = Vote(user_id, vote_type)
         if self.author_id == user_id:
             raise FeedbackLikeError(error_message="Невозможно оценивать свой отзыв")
-        elif vote in self.votes:
+        if vote in self.votes:
             raise FeedbackLikeError(error_message="Отзыв уже оценен")
-        elif alternative_vote in self.votes:
+        if alternative_vote in self.votes:
             self.votes.remove(alternative_vote)
             self.votes.add(vote)
         else:
