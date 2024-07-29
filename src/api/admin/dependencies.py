@@ -22,8 +22,8 @@ async def get_admin(
     """
     if user.role != "admin":
         raise ApplicationError(
-            "Недостаточно прав для совершения операции",
-            status.HTTP_403_FORBIDDEN,
+            message="Недостаточно прав для совершения операции",
+            status=status.HTTP_403_FORBIDDEN,
         )
     return user
 

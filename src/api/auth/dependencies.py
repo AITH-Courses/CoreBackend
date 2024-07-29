@@ -1,10 +1,9 @@
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.auth.schemas import UserDTO
-from src.api.base_schemas import ErrorResponse
 from src.domain.auth.exceptions import UserBySessionNotFoundError
 from src.exceptions import ApplicationError
 from src.infrastructure.redis.auth.session_service import RedisSessionService
@@ -37,8 +36,8 @@ def get_auth_token(credentials: HTTPAuthorizationCredentials = Depends(HTTPBeare
     """
     if not credentials:
         raise ApplicationError(
-            "Требуется указать токен авторизации",
-            status.HTTP_401_UNAUTHORIZED,
+            message="Требуется войти в аккаунт",
+            status=status.HTTP_401_UNAUTHORIZED,
         )
     return credentials.credentials
 
@@ -63,7 +62,10 @@ async def get_user(
             role=user.role.value,
         )
     except UserBySessionNotFoundError as ex:
-        raise ApplicationError("Требуется войти в аккаунт", status.HTTP_401_UNAUTHORIZED)
+        raise ApplicationError(
+            message="Требуется перезайти в аккаунт",
+            status=status.HTTP_401_UNAUTHORIZED,
+        ) from ex
 
 
 async def get_user_or_anonym(
