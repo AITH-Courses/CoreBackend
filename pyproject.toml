@@ -43,6 +43,6 @@ fix=true
 unsafe-fixes=false
 line-length = 120
 lint.select = ["ALL"]
-lint.ignore = ["F401", "D211", "D213", "D100", "D104", "D102", "D107", "ANN003", "B008", "PLR0913", "TCH003"]
+lint.ignore = ["D211", "D213", "D100", "D104", "D102", "D107", "ANN003", "B008", "PLR0913", "TCH003"]
 extend-include = ["*.ipynb"]
 lint.allowed-confusables = ["с"]
