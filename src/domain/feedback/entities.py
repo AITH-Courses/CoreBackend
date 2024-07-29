@@ -19,7 +19,9 @@ class FeedbackEntity:
 
     def unvote(self, user_id: str, vote_type: str) -> None:
         vote = Vote(user_id, vote_type)
-        self.votes.discard(vote)
+        if vote not in self.votes:
+            raise FeedbackLikeError(error_message="Невозможно отменить оценку для неоцененного отзыва")
+        self.votes.remove(vote)
 
     def vote(self, user_id: str, vote_type: str) -> None:
         alternative_vote_type = "dislike" if vote_type == "like" else "like"
