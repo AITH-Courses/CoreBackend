@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 
 from src.api.admin.course_router import router as admin_course_router
 from src.api.auth.router import router as auth_router
+from src.api.base_schemas import ErrorResponse
 from src.api.courses.router import router as course_router
 from src.api.feedback.router import router as feedback_router
 from src.api.health_check import router as health_check_router
@@ -29,7 +30,7 @@ def add_exception_handler(application: FastAPI) -> None:
         """
         return JSONResponse(
             status_code=exc.status,
-            content={"message": exc.message},
+            content=ErrorResponse(message=exc.message),
         )
 
 

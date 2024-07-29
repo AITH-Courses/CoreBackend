@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.api.auth.schemas import UserDTO
 from src.api.base_schemas import ErrorResponse
 from src.domain.auth.exceptions import UserBySessionNotFoundError
+from src.exceptions import ApplicationError
 from src.infrastructure.redis.auth.session_service import RedisSessionService
 from src.infrastructure.redis.session import get_redis_session
 from src.infrastructure.sqlalchemy.session import get_async_session
@@ -35,9 +36,9 @@ def get_auth_token(credentials: HTTPAuthorizationCredentials = Depends(HTTPBeare
     :return:
     """
     if not credentials:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=ErrorResponse(message="You need to specify Bearer token in authorization header").model_dump(),
+        raise ApplicationError(
+            "Требуется указать токен авторизации",
+            status.HTTP_401_UNAUTHORIZED,
         )
     return credentials.credentials
 
@@ -62,10 +63,7 @@ async def get_user(
             role=user.role.value,
         )
     except UserBySessionNotFoundError as ex:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=ErrorResponse(message="You need to login to your account").model_dump(),
-        ) from ex
+        raise ApplicationError("Требуется войти в аккаунт", status.HTTP_401_UNAUTHORIZED)
 
 
 async def get_user_or_anonym(
