@@ -47,14 +47,14 @@ class RedisFeedbackCacheService(FeedbackCacheService):
             date=datetime.date.fromisoformat(feedback_["date"]),
         )
 
-    async def get_many_by_course_id(self, course_id: str) -> list[FeedbackEntity]:
+    async def get_many_by_course_id(self, course_id: str) -> list[FeedbackEntity] | None:
         try:
             feedbacks_key = self.feedback_key(course_id)
             feedbacks_data_string = await self.session.get(feedbacks_key)
             feedbacks_data = json.loads(feedbacks_data_string)
             return [self.__from_dict_to_domain(feedback) for feedback in feedbacks_data]
         except (TypeError, JSONDecodeError):  # no such key in Redis
-            return []
+            return None
 
     async def delete_many(self, course_id: str) -> None:
         feedbacks_key = self.feedback_key(course_id)

@@ -18,7 +18,7 @@ class FeedbackQueryService:
 
     async def get_feedbacks_by_course_id(self, course_id: str) -> list[FeedbackEntity]:
         feedbacks_from_cache = await self.feedback_cache_service.get_many_by_course_id(course_id)
-        if feedbacks_from_cache:
+        if feedbacks_from_cache is not None:
             return feedbacks_from_cache
         feedbacks = await self.feedback_repo.get_all_by_course_id(course_id)
         await self.feedback_cache_service.set_many(course_id, feedbacks)

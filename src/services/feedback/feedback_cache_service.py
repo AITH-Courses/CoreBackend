@@ -12,7 +12,7 @@ class FeedbackCacheService(ABC):
     """Base class for cache of feedback as service."""
 
     @abstractmethod
-    async def get_many_by_course_id(self, course_id: str) -> list[FeedbackEntity]:
+    async def get_many_by_course_id(self, course_id: str) -> list[FeedbackEntity] | None:
         raise NotImplementedError
 
     @abstractmethod
