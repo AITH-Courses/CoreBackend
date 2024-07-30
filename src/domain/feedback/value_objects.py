@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 
 from src.domain.courses.exceptions import EmptyPropertyError, ValueDoesntExistError
-from src.domain.feedback.contants import VOTE_TYPES
+from src.domain.feedback.contants import MAX_RATING_VALUE, MIN_RATING_VALUE, VOTE_TYPES
 
 
 @dataclass(init=False, eq=True, frozen=True)
@@ -34,4 +34,21 @@ class FeedbackText:
         """
         if value == "":
             raise EmptyPropertyError(property_name="text")
+        object.__setattr__(self, "value", value)
+
+
+@dataclass(init=False, eq=True, frozen=True)
+class Rating:
+
+    """Rating of course in feedback as a value object."""
+
+    value: int
+
+    def __init__(self, value: int) -> None:
+        """Initialize object.
+
+        :param value:
+        """
+        if value < MIN_RATING_VALUE or value > MAX_RATING_VALUE:
+            raise ValueDoesntExistError(property_name="rating")
         object.__setattr__(self, "value", value)

@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.domain.feedback.entities import FeedbackEntity
 from src.domain.feedback.exceptions import FeedbackNotFoundError
-from src.domain.feedback.value_objects import FeedbackText
+from src.domain.feedback.value_objects import FeedbackText, Rating
 from src.infrastructure.sqlalchemy.feedback.repository import SQLAlchemyFeedbackRepository
 
 
@@ -19,7 +19,8 @@ async def create_feedback(async_session: AsyncSession) -> tuple[str, str, str, S
         id=feedback_id,
         course_id=course_id,
         author_id=author_id,
-        text=FeedbackText("Cool")
+        text=FeedbackText("Cool"),
+        rating=Rating(5)
     ))
     await async_session.commit()
     return feedback_id, course_id, author_id, repo
@@ -43,6 +44,7 @@ async def test_get_many_feedbacks(test_async_session: AsyncSession):
         course_id=course_id,
         author_id=author_id,
         text=FeedbackText("Cool 2"),
+        rating=Rating(5),
         date=datetime.date.today() + datetime.timedelta(days=1)
     ))
     await test_async_session.commit()

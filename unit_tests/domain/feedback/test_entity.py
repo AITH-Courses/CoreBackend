@@ -4,14 +4,15 @@ import pytest
 
 from src.domain.feedback.entities import FeedbackEntity
 from src.domain.feedback.exceptions import FeedbackLikeError
-from src.domain.feedback.value_objects import FeedbackText, Vote
+from src.domain.feedback.value_objects import FeedbackText, Vote, Rating
 
 
 @pytest.fixture
 def correct_feedback() -> FeedbackEntity:
     text = FeedbackText("Cool!")
+    rating = Rating(5)
     date = datetime.date(year=2024, month=12, day=1)
-    return FeedbackEntity("12321", "12352", "author", text, set(), date)
+    return FeedbackEntity("12321", "12352", "author", text, rating, set(), date)
 
 
 def test_correct_feedback(correct_feedback):
@@ -59,6 +60,6 @@ def test_add_vote_from_author(correct_feedback):
 
 def test_unvote(correct_feedback):
     user_id, vote_type = "1231fa", "like"
-    correct_feedback.unvote(user_id, vote_type)
+    correct_feedback.unvote(user_id)
     correct_feedback.vote(user_id, vote_type)
-    correct_feedback.unvote(user_id, vote_type)
+    correct_feedback.unvote(user_id)

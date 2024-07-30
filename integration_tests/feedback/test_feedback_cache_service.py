@@ -4,7 +4,7 @@ import uuid
 import pytest
 
 from src.domain.feedback.entities import FeedbackEntity
-from src.domain.feedback.value_objects import FeedbackText, Vote
+from src.domain.feedback.value_objects import FeedbackText, Vote, Rating
 from src.infrastructure.redis.feedback.feedback_cache_service import RedisFeedbackCacheService
 
 
@@ -21,6 +21,7 @@ async def test_operations_with_one_course(redis_feedback_cache_service):
         course_id=course_id,
         author_id=str(uuid.uuid4()),
         text=FeedbackText("Cool"),
+        rating=Rating(5),
         votes={Vote(str(uuid.uuid4()), "like")},
         date=datetime.date.today()
     )]
@@ -30,8 +31,9 @@ async def test_operations_with_one_course(redis_feedback_cache_service):
     assert len(getting_feedbacks) == 1
     assert len(getting_feedbacks[0].votes) == 1
     assert getting_feedbacks[0].text.value == "Cool"
+    assert getting_feedbacks[0].rating.value == 5
 
     await redis_feedback_cache_service.delete_many(course_id)
 
     deleted_course = await redis_feedback_cache_service.get_many_by_course_id(course_id)
-    assert len(deleted_course) == 0
+    assert deleted_course is None

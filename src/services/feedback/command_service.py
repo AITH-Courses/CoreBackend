@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 
 from src.domain.feedback.entities import FeedbackEntity
 from src.domain.feedback.exceptions import FeedbackBelongsToAnotherUserError, FeedbackNotFoundError
-from src.domain.feedback.value_objects import FeedbackText
+from src.domain.feedback.value_objects import FeedbackText, Rating
 
 if TYPE_CHECKING:
     from src.services.feedback.unit_of_work import FeedbackUnitOfWork
@@ -18,10 +18,11 @@ class FeedbackCommandService:
     def __init__(self, uow: FeedbackUnitOfWork) -> None:
         self.uow = uow
 
-    async def create_feedback(self, course_id: str, author_id: str, text_: str) -> str:
+    async def create_feedback(self, course_id: str, author_id: str, text_: str, rating_: int) -> str:
         feedback_id = str(uuid.uuid4())
         text = FeedbackText(text_)
-        feedback = FeedbackEntity(feedback_id, course_id, author_id, text)
+        rating = Rating(rating_)
+        feedback = FeedbackEntity(feedback_id, course_id, author_id, text, rating)
         try:
             await self.uow.feedback_repo.create(feedback)
             await self.uow.commit()

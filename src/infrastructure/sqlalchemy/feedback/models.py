@@ -3,11 +3,11 @@ from __future__ import annotations
 import datetime
 import uuid
 
-from sqlalchemy import Date, ForeignKey, Text, text
+from sqlalchemy import Date, ForeignKey, Integer, Text, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.domain.feedback.entities import FeedbackEntity
-from src.domain.feedback.value_objects import FeedbackText, Vote
+from src.domain.feedback.value_objects import FeedbackText, Rating, Vote
 from src.infrastructure.sqlalchemy.session import Base
 
 
@@ -21,6 +21,7 @@ class Feedback(Base):
     course_id: Mapped[uuid.UUID] = mapped_column(nullable=False)
     author_id: Mapped[uuid.UUID] = mapped_column(nullable=False)
     content: Mapped[str] = mapped_column(Text, nullable=False)
+    rating: Mapped[int] = mapped_column(Integer, server_default="5", nullable=False)
     votes: Mapped[list[VoteForFeedback]] = relationship(back_populates="feedback")
     date: Mapped[datetime.date] = mapped_column(Date, nullable=False)
 
@@ -30,7 +31,6 @@ class Feedback(Base):
         server_default=text("TIMEZONE('utc', now())"),
     )
     updated_at: Mapped[datetime.datetime] = mapped_column(
-
         server_default=text("TIMEZONE('utc', now())"),
         onupdate=datetime.datetime.utcnow,
     )
@@ -42,6 +42,7 @@ class Feedback(Base):
             course_id=feedback.course_id,
             author_id=feedback.author_id,
             content=feedback.text.value,
+            rating=feedback.rating.value,
             date=feedback.date,
             votes=[
                 VoteForFeedback(
@@ -59,6 +60,7 @@ class Feedback(Base):
             course_id=str(self.course_id),
             author_id=str(self.author_id),
             text=FeedbackText(self.content),
+            rating=Rating(self.rating),
             votes={Vote(user_id=str(vote.user_id), vote_type=vote.vote_type) for vote in self.votes},
             date=self.date,
         )

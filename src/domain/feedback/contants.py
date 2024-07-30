@@ -1,1 +1,3 @@
 VOTE_TYPES = ["like", "dislike"]
+MAX_RATING_VALUE = 5
+MIN_RATING_VALUE = 1

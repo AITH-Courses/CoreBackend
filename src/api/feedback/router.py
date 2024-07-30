@@ -10,7 +10,12 @@ from src.api.base_schemas import ErrorResponse, SuccessResponse
 from src.api.feedback.dependencies import get_feedback_command_service, get_feedback_query_service
 from src.api.feedback.schemas import CreateFeedbackRequest, CreateFeedbackResponse, FeedbackDTO, VoteDTO
 from src.domain.courses.exceptions import EmptyPropertyError, ValueDoesntExistError
-from src.domain.feedback.exceptions import FeedbackBelongsToAnotherUserError, FeedbackLikeError, FeedbackNotFoundError
+from src.domain.feedback.exceptions import (
+    FeedbackBelongsToAnotherUserError,
+    FeedbackLikeError,
+    FeedbackNotFoundError,
+    OnlyOneFeedbackForCourseError,
+)
 
 if TYPE_CHECKING:
     from src.api.auth.schemas import UserDTO
@@ -59,6 +64,10 @@ async def get_feedbacks(
             "model": list[FeedbackDTO],
             "description": "Feedbacks for one course",
         },
+        status.HTTP_400_BAD_REQUEST: {
+            "model": ErrorResponse,
+            "description": "Error",
+        },
         status.HTTP_422_UNPROCESSABLE_ENTITY: {
             "model": ErrorResponse,
             "description": "Error",
@@ -83,16 +92,21 @@ async def create_feedback(
     :return:
     """
     try:
-        feedback_id = await command_service.create_feedback(course_id, user.id, data.text)
+        feedback_id = await command_service.create_feedback(course_id, user.id, data.text, data.rating)
         await query_service.feedback_cache_service.delete_many(course_id)
         return JSONResponse(
             content=CreateFeedbackResponse(feedback_id=feedback_id).model_dump(),
             status_code=status.HTTP_201_CREATED,
         )
-    except EmptyPropertyError as ex:
+    except (EmptyPropertyError, ValueDoesntExistError) as ex:
         return JSONResponse(
             content=ErrorResponse(message=ex.message).model_dump(),
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+        )
+    except OnlyOneFeedbackForCourseError as ex:
+        return JSONResponse(
+            content=ErrorResponse(message=ex.message).model_dump(),
+            status_code=status.HTTP_400_BAD_REQUEST,
         )
 
 

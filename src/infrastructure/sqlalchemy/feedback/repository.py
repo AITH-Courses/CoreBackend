@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import joinedload
 
-from src.domain.feedback.exceptions import FeedbackNotFoundError
+from src.domain.feedback.exceptions import FeedbackNotFoundError, OnlyOneFeedbackForCourseError
 from src.domain.feedback.feedback_repository import IFeedbackRepository
 from src.infrastructure.sqlalchemy.feedback.models import Feedback, VoteForFeedback
 
@@ -24,6 +24,7 @@ class SQLAlchemyFeedbackRepository(IFeedbackRepository):
         self.session = session
 
     async def create(self, feedback: FeedbackEntity) -> None:
+        await self.__check_one_by_user_id_and_course_id(feedback.author_id, feedback.course_id)
         feedback_ = Feedback.from_domain(feedback)
         self.session.add(feedback_)
 
@@ -53,6 +54,19 @@ class SQLAlchemyFeedbackRepository(IFeedbackRepository):
             return result.unique().scalars().one()
         except NoResultFound as ex:
             raise FeedbackNotFoundError from ex
+
+    async def __check_one_by_user_id_and_course_id(self, author_id: str, course_id: str) -> None:
+        query = (
+            select(Feedback.id)
+            .filter_by(author_id=author_id, course_id=course_id, is_archive=False)
+        )
+        try:
+            result = await self.session.execute(query)
+            feedback_id = result.unique().scalar()
+            if feedback_id:
+                raise OnlyOneFeedbackForCourseError
+        except NoResultFound:
+            pass
 
     async def get_all_by_course_id(self, course_id: str) -> list[FeedbackEntity]:
         query = (

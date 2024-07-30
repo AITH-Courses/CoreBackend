@@ -4,7 +4,7 @@ import datetime
 from dataclasses import dataclass, field
 
 from src.domain.feedback.exceptions import FeedbackLikeError
-from src.domain.feedback.value_objects import FeedbackText, Vote
+from src.domain.feedback.value_objects import FeedbackText, Rating, Vote
 
 
 @dataclass
@@ -16,6 +16,7 @@ class FeedbackEntity:
     course_id: str
     author_id: str
     text: FeedbackText
+    rating: Rating
     votes: set[Vote] = field(default_factory=list)
     date: datetime.date = field(default_factory=datetime.date.today)
 

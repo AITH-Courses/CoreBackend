@@ -1,7 +1,7 @@
 import pytest
 
 from src.domain.courses.exceptions import EmptyPropertyError, ValueDoesntExistError
-from src.domain.feedback.value_objects import FeedbackText, Vote
+from src.domain.feedback.value_objects import FeedbackText, Vote, Rating
 
 
 def test_correct_feedback_text():
@@ -13,6 +13,17 @@ def test_correct_feedback_text():
 def test_incorrect_feedback_text():
     with pytest.raises(EmptyPropertyError):
         FeedbackText("")
+
+
+def test_correct_feedback_rating():
+    feedback_rating_number = 1
+    feedback_rating = Rating(feedback_rating_number)
+    assert feedback_rating.value == feedback_rating_number
+
+
+def test_incorrect_feedback_rating():
+    with pytest.raises(ValueDoesntExistError):
+        Rating(-1)
 
 
 def test_correct_vote():

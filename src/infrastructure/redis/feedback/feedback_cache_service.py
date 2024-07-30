@@ -6,7 +6,7 @@ from json.decoder import JSONDecodeError
 from typing import TYPE_CHECKING
 
 from src.domain.feedback.entities import FeedbackEntity
-from src.domain.feedback.value_objects import FeedbackText, Vote
+from src.domain.feedback.value_objects import FeedbackText, Rating, Vote
 from src.infrastructure.redis.feedback.constants import TIME_TO_LIVE_FEEDBACKS
 from src.services.feedback.feedback_cache_service import FeedbackCacheService
 
@@ -32,6 +32,7 @@ class RedisFeedbackCacheService(FeedbackCacheService):
             "course_id": feedback.course_id,
             "author_id": feedback.author_id,
             "text": feedback.text.value,
+            "rating": feedback.rating.value,
             "votes": [{"user_id": vote.user_id, "vote_type": vote.vote_type} for vote in feedback.votes],
             "date": feedback.date.strftime("%Y-%m-%d"),
         }
@@ -43,6 +44,7 @@ class RedisFeedbackCacheService(FeedbackCacheService):
             course_id=feedback_["course_id"],
             author_id=feedback_["author_id"],
             text=FeedbackText(feedback_["text"]),
+            rating=Rating(feedback_["rating"]),
             votes={Vote(vote["user_id"], vote["vote_type"]) for vote in feedback_["votes"]},
             date=datetime.date.fromisoformat(feedback_["date"]),
         )

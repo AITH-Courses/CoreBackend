@@ -10,6 +10,7 @@ class FeedbackDTO(BaseModel):
 
     id: str = Field("c5a4bfb7-0349-4d07-b6d8-b21c8777602b")
     text: str = Field("Cool course!")
+    rating: int = Field(5)
     is_author: bool = Field(default=False)
     liked_by_user: bool = Field(default=True)
     disliked_by_user: bool = Field(default=False)
@@ -21,6 +22,7 @@ class FeedbackDTO(BaseModel):
         return FeedbackDTO(
             id=feedback.id,
             text=feedback.text.value,
+            rating=feedback.rating.value,
             is_author=feedback.author_id == user_id,
             liked_by_user=Vote(user_id, "like") in feedback.votes,
             disliked_by_user=Vote(user_id, "dislike") in feedback.votes,
@@ -34,6 +36,7 @@ class CreateFeedbackRequest(BaseModel):
     """Schema of request for creating feedback."""
 
     text: str = Field("Cool course!")
+    rating: int = Field(5)
 
 
 class CreateFeedbackResponse(BaseModel):

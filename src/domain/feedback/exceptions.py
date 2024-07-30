@@ -31,3 +31,12 @@ class FeedbackBelongsToAnotherUserError(DomainError):
     @property
     def message(self) -> str:
         return "Для удаления отзыва требуется быть автором"
+
+
+class OnlyOneFeedbackForCourseError(DomainError):
+
+    """Feedback is only one for course by user."""
+
+    @property
+    def message(self) -> str:
+        return "Нельзя создать больше одного отзыва на курс"
