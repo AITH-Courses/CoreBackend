@@ -33,5 +33,5 @@ class FeedbackText:
         :param value:
         """
         if value == "":
-            raise EmptyPropertyError(property_name="role")
+            raise EmptyPropertyError(property_name="text")
         object.__setattr__(self, "value", value)
