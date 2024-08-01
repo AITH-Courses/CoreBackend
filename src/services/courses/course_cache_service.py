@@ -24,7 +24,7 @@ class CourseCacheService(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def get_many(self) -> list[CourseEntity]:
+    async def get_many(self) -> list[CourseEntity] | None:
         raise NotImplementedError
 
     @abstractmethod

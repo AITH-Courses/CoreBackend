@@ -22,7 +22,7 @@ def get_talent_courses_query_service(
     :return:
     """
     course_repo = SQLAlchemyCourseRepository(db_session)
-    course_cache_service = RedisCourseCacheService(cache_session)
+    course_cache_service = RedisCourseCacheService(cache_session, "talent")
     return TalentCourseQueryService(course_repo, course_cache_service)
 
 

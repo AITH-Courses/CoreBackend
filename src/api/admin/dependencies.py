@@ -39,5 +39,5 @@ def get_admin_courses_query_service(
     :return:
     """
     course_repo = SQLAlchemyCourseRepository(db_session)
-    course_cache_service = RedisCourseCacheService(cache_session)
+    course_cache_service = RedisCourseCacheService(cache_session, "admin")
     return AdminCourseQueryService(course_repo, course_cache_service)

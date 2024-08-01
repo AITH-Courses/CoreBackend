@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 from json.decoder import JSONDecodeError
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Literal
 
 from src.domain.courses.entities import CourseEntity
 from src.domain.courses.value_objects import Author, CourseName, CourseRun, Format, Implementer, Period, Role, Terms
@@ -13,16 +13,19 @@ if TYPE_CHECKING:
     from redis.asyncio import Redis
 
 
-COURSES_KEY = "courses"
-COURSE_KEY = "course_"
-
-
 class RedisCourseCacheService(CourseCacheService):
 
     """Redis implementation class for cache of course as service."""
 
-    def __init__(self, session: Redis) -> None:
+    def __init__(self, session: Redis, prefix: Literal['admin', 'talent']) -> None:
         self.session = session
+        self.prefix = prefix
+
+    def __get_course_key(self, course_id: str) -> str:
+        return self.prefix + "-course-" + course_id
+
+    def __get_courses_key(self) -> str:
+        return self.prefix + "-courses"
 
     @staticmethod
     def __from_domain_to_dict(course: CourseEntity) -> dict:
@@ -72,32 +75,32 @@ class RedisCourseCacheService(CourseCacheService):
 
     async def get_one(self, course_id: str) -> CourseEntity | None:
         try:
-            course_data_string = await self.session.get(COURSE_KEY + course_id)
+            course_data_string = await self.session.get(self.__get_course_key(course_id))
             course_dict = json.loads(course_data_string)
             return self.__from_dict_to_domain(course_dict)
         except (TypeError, JSONDecodeError):  # no such key in Redis
             return None
 
     async def delete_one(self, course_id: str) -> None:
-        await self.session.delete(COURSE_KEY + course_id)
+        await self.session.delete(self.__get_course_key(course_id))
 
     async def set_one(self, course: CourseEntity) -> None:
         course_dict = self.__from_domain_to_dict(course)
         course_data_string = json.dumps(course_dict)
-        await self.session.setex(COURSE_KEY + course.id, TIME_TO_LIVE_ONE_COURSE, course_data_string)
+        await self.session.setex(self.__get_course_key(course.id), TIME_TO_LIVE_ONE_COURSE, course_data_string)
 
-    async def get_many(self) -> list[CourseEntity]:
+    async def get_many(self) -> list[CourseEntity] | None:
         try:
-            courses_data_string = await self.session.get(COURSES_KEY)
+            courses_data_string = await self.session.get(self.__get_courses_key())
             courses_dict = json.loads(courses_data_string)
             return [self.__from_dict_to_domain(course_dict) for course_dict in courses_dict]
         except (TypeError, JSONDecodeError):  # no such key in Redis
-            return []
+            return None
 
     async def delete_many(self) -> None:
-        await self.session.delete(COURSES_KEY)
+        await self.session.delete(self.__get_courses_key())
 
     async def set_many(self, courses: list[CourseEntity]) -> None:
         courses_dict = [self.__from_domain_to_dict(course) for course in courses]
         courses_data_string = json.dumps(courses_dict)
-        await self.session.setex(COURSES_KEY, TIME_TO_LIVE_ALL_COURSES, courses_data_string)
+        await self.session.setex(self.__get_courses_key(), TIME_TO_LIVE_ALL_COURSES, courses_data_string)

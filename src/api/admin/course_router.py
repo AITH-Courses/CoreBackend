@@ -8,7 +8,7 @@ from fastapi.responses import JSONResponse
 from src.api.admin.dependencies import get_admin, get_admin_courses_query_service
 from src.api.admin.schemas import CreateCourseRequest, CreateCourseResponse, UpdateCourseRequest
 from src.api.base_schemas import ErrorResponse, SuccessResponse
-from src.api.courses.dependencies import get_courses_command_service
+from src.api.courses.dependencies import get_courses_command_service, get_talent_courses_query_service
 from src.api.courses.schemas import CourseFullDTO, CourseShortDTO
 from src.domain.courses.exceptions import (
     CourseAlreadyExistsError,
@@ -18,6 +18,7 @@ from src.domain.courses.exceptions import (
     IncorrectCourseRunNameError,
     ValueDoesntExistError,
 )
+from src.services.courses.query_service_for_talent import TalentCourseQueryService
 
 if TYPE_CHECKING:
     from src.api.auth.schemas import UserDTO
@@ -53,10 +54,13 @@ async def create_course(
     data: CreateCourseRequest = Body(),
     _: UserDTO = Depends(get_admin),
     command_service: CourseCommandService = Depends(get_courses_command_service),
-    query_service: AdminCourseQueryService = Depends(get_admin_courses_query_service),
+    admin_query_service: AdminCourseQueryService = Depends(get_admin_courses_query_service),
+    talent_query_service: TalentCourseQueryService = Depends(get_talent_courses_query_service),
 ) -> JSONResponse:
     """Create course.
 
+    :param admin_query_service:
+    :param talent_query_service:
     :param _:
     :param query_service:
     :param data:
@@ -65,8 +69,8 @@ async def create_course(
     """
     try:
         course_id = await command_service.create_course(data.name)
-        await query_service.course_cache_service.delete_one(course_id)
-        await query_service.course_cache_service.delete_many()
+        await admin_query_service.course_cache_service.delete_many()
+        await talent_query_service.course_cache_service.delete_many()
         return JSONResponse(
             content=CreateCourseResponse(course_id=course_id).model_dump(),
             status_code=status.HTTP_201_CREATED,
@@ -113,12 +117,14 @@ async def update_course(
     data: UpdateCourseRequest = Body(),
     _: UserDTO = Depends(get_admin),
     command_service: CourseCommandService = Depends(get_courses_command_service),
-    query_service: AdminCourseQueryService = Depends(get_admin_courses_query_service),
+    admin_query_service: AdminCourseQueryService = Depends(get_admin_courses_query_service),
+    talent_query_service: TalentCourseQueryService = Depends(get_talent_courses_query_service),
 ) -> JSONResponse:
     """Create course.
 
+    :param talent_query_service:
+    :param admin_query_service:
     :param _:
-    :param query_service:
     :param course_id:
     :param data:
     :param command_service:
@@ -136,8 +142,10 @@ async def update_course(
             terms_=data.terms, roles=data.roles,
             periods=data.periods, runs=data.last_runs,
         )
-        await query_service.course_cache_service.delete_one(course_id)
-        await query_service.course_cache_service.delete_many()
+        await admin_query_service.course_cache_service.delete_one(course_id)
+        await talent_query_service.course_cache_service.delete_one(course_id)
+        await admin_query_service.course_cache_service.delete_many()
+        await talent_query_service.course_cache_service.delete_many()
         return JSONResponse(
             content=SuccessResponse(message="Course has updated").model_dump(),
             status_code=status.HTTP_200_OK,
@@ -180,20 +188,24 @@ async def delete_course(
     course_id: str = Path(),
     _: UserDTO = Depends(get_admin),
     command_service: CourseCommandService = Depends(get_courses_command_service),
-    query_service: AdminCourseQueryService = Depends(get_admin_courses_query_service),
+    admin_query_service: AdminCourseQueryService = Depends(get_admin_courses_query_service),
+    talent_query_service: TalentCourseQueryService = Depends(get_talent_courses_query_service),
 ) -> JSONResponse:
     """Create course.
 
+    :param talent_query_service:
+    :param admin_query_service:
     :param _:
-    :param query_service:
     :param course_id:
     :param command_service:
     :return:
     """
     try:
         await command_service.delete_course(course_id)
-        await query_service.course_cache_service.delete_one(course_id)
-        await query_service.course_cache_service.delete_many()
+        await admin_query_service.course_cache_service.delete_one(course_id)
+        await talent_query_service.course_cache_service.delete_one(course_id)
+        await admin_query_service.course_cache_service.delete_many()
+        await talent_query_service.course_cache_service.delete_many()
         return JSONResponse(
             content=SuccessResponse(message="Course has deleted").model_dump(),
             status_code=status.HTTP_200_OK,
@@ -299,20 +311,24 @@ async def publish_course(
     course_id: str = Path(),
     _: UserDTO = Depends(get_admin),
     command_service: CourseCommandService = Depends(get_courses_command_service),
-    query_service: AdminCourseQueryService = Depends(get_admin_courses_query_service),
+    admin_query_service: AdminCourseQueryService = Depends(get_admin_courses_query_service),
+    talent_query_service: TalentCourseQueryService = Depends(get_talent_courses_query_service),
 ) -> JSONResponse:
     """Publish course.
 
+    :param talent_query_service:
+    :param admin_query_service:
     :param _:
-    :param query_service:
     :param course_id:
     :param command_service:
     :return:
     """
     try:
         await command_service.publish_course(course_id)
-        await query_service.course_cache_service.delete_one(course_id)
-        await query_service.course_cache_service.delete_many()
+        await admin_query_service.course_cache_service.delete_one(course_id)
+        await talent_query_service.course_cache_service.delete_one(course_id)
+        await admin_query_service.course_cache_service.delete_many()
+        await talent_query_service.course_cache_service.delete_many()
         return JSONResponse(
             content=SuccessResponse(message="Course has published").model_dump(),
             status_code=status.HTTP_200_OK,
@@ -354,20 +370,24 @@ async def hide_course(
     course_id: str = Path(),
     _: UserDTO = Depends(get_admin),
     command_service: CourseCommandService = Depends(get_courses_command_service),
-    query_service: AdminCourseQueryService = Depends(get_admin_courses_query_service),
+    admin_query_service: AdminCourseQueryService = Depends(get_admin_courses_query_service),
+    talent_query_service: TalentCourseQueryService = Depends(get_talent_courses_query_service),
 ) -> JSONResponse:
     """Hide/unpublish course.
 
+    :param talent_query_service:
+    :param admin_query_service:
     :param _:
-    :param query_service:
     :param course_id:
     :param command_service:
     :return:
     """
     try:
         await command_service.hide_course(course_id)
-        await query_service.course_cache_service.delete_one(course_id)
-        await query_service.course_cache_service.delete_many()
+        await admin_query_service.course_cache_service.delete_one(course_id)
+        await talent_query_service.course_cache_service.delete_one(course_id)
+        await admin_query_service.course_cache_service.delete_many()
+        await talent_query_service.course_cache_service.delete_many()
         return JSONResponse(
             content=SuccessResponse(message="Course has unpublished").model_dump(),
             status_code=status.HTTP_200_OK,
