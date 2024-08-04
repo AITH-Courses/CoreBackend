@@ -7,6 +7,7 @@ from src.domain.auth.constants import TIME_TO_LIVE_AUTH_SESSION
 from src.domain.auth.entities import UserEntity
 from src.domain.auth.exceptions import UserBySessionNotFoundError
 from src.domain.auth.value_objects import Email, PartOfName, UserRole
+from src.domain.base_value_objects import UUID
 from src.services.auth.session_service import SessionService
 
 
@@ -20,7 +21,7 @@ class RedisSessionService(SessionService):
     @staticmethod
     def from_domain_to_json_string(user: UserEntity) -> str:
         user_dict = {
-            "id": user.id,
+            "id": user.id.value,
             "firstname": user.firstname.value,
             "lastname": user.lastname.value,
             "role": user.role.value,
@@ -34,7 +35,7 @@ class RedisSessionService(SessionService):
             user_data_string = await self.session.get(auth_token)
             user_dict = json.loads(user_data_string)
             return UserEntity(
-                id=user_dict["id"],
+                id=UUID(user_dict["id"]),
                 firstname=PartOfName(user_dict["firstname"]),
                 lastname=PartOfName(user_dict["lastname"]),
                 role=UserRole(user_dict["role"]),

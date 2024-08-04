@@ -37,7 +37,7 @@ class CourseFullDTO(BaseModel):
     @staticmethod
     def from_domain(course: CourseEntity) -> CourseFullDTO:
         return CourseFullDTO(
-            id=course.id,
+            id=course.id.value,
             name=course.name.value,
             image_url=course.image_url,
             limits=course.limits,
@@ -76,7 +76,7 @@ class CourseShortDTO(BaseModel):
     @staticmethod
     def from_domain(course: CourseEntity) -> CourseShortDTO:
         return CourseShortDTO(
-            id=course.id,
+            id=course.id.value,
             name=course.name.value,
             image_url=course.image_url,
             is_draft=course.is_draft,

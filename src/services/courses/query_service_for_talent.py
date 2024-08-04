@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
+from src.domain.base_value_objects import UUID
 from src.domain.courses.exceptions import CourseNotFoundError
 
 if TYPE_CHECKING:
@@ -31,6 +32,7 @@ class TalentCourseQueryService:
         self.course_cache_service = course_cache_service
 
     async def get_course(self, course_id: str) -> CourseEntity:
+        course_id = UUID(course_id)
         course_from_cache = await self.course_cache_service.get_one(course_id)
         if course_from_cache and not course_from_cache.is_draft:
             return course_from_cache
@@ -48,6 +50,10 @@ class TalentCourseQueryService:
         courses = [course for course in courses if not course.is_draft]
         await self.course_cache_service.set_many(courses)
         return [course for course in courses if self.__matched(course, filters)]
+
+    async def invalidate_course(self, course_id: str) -> None:
+        await self.course_cache_service.delete_one(UUID(course_id))
+        await self.course_cache_service.delete_many()
 
     @staticmethod
     def __matched(course: CourseEntity, filters: CourseFilter) -> bool:

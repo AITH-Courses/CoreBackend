@@ -6,6 +6,7 @@ from src.domain.auth.entities import UserEntity
 from src.domain.auth.exceptions import UserNotFoundError
 from src.domain.auth.user_repository import IUserRepository
 from src.domain.auth.value_objects import Email
+from src.domain.base_value_objects import UUID
 from src.infrastructure.sqlalchemy.users.models import User
 
 
@@ -21,18 +22,18 @@ class SQLAlchemyUserRepository(IUserRepository):
         self.session.add(user_)
 
     async def update(self, user: UserEntity) -> None:
-        user_ = await self.__get_by_field(id=user.id)
+        user_ = await self.__get_by_field(id=user.id.value)
         user_.firstname = user.firstname.value
         user_.lastname = user.lastname.value
         user_.email = user.email.value
         user_.hashed_password = user.hashed_password
 
-    async def delete(self, user_id: str) -> None:
-        user_ = await self.__get_by_field(id=user_id)
+    async def delete(self, user_id: UUID) -> None:
+        user_ = await self.__get_by_field(id=user_id.value)
         await self.session.delete(user_)
 
-    async def get_by_id(self, user_id: str) -> UserEntity:
-        user = await self.__get_by_field(id=user_id)
+    async def get_by_id(self, user_id: UUID) -> UserEntity:
+        user = await self.__get_by_field(id=user_id.value)
         return user.to_domain()
 
     async def get_by_email(self, email: Email) -> UserEntity:

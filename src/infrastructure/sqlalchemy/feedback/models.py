@@ -6,6 +6,7 @@ import uuid
 from sqlalchemy import Date, ForeignKey, Integer, Text, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from src.domain.base_value_objects import UUID
 from src.domain.feedback.entities import FeedbackEntity
 from src.domain.feedback.value_objects import FeedbackText, Rating, Vote
 from src.infrastructure.sqlalchemy.session import Base
@@ -38,16 +39,16 @@ class Feedback(Base):
     @staticmethod
     def from_domain(feedback: FeedbackEntity) -> Feedback:
         return Feedback(
-            id=uuid.UUID(feedback.id),
-            course_id=feedback.course_id,
-            author_id=feedback.author_id,
+            id=uuid.UUID(feedback.id.value),
+            course_id=uuid.UUID(feedback.course_id.value),
+            author_id=uuid.UUID(feedback.author_id.value),
             content=feedback.text.value,
             rating=feedback.rating.value,
             date=feedback.date,
             votes=[
                 VoteForFeedback(
-                    feedback_id=uuid.UUID(feedback.id),
-                    user_id=uuid.UUID(vote.user_id),
+                    feedback_id=uuid.UUID(feedback.id.value),
+                    user_id=uuid.UUID(vote.user_id.value),
                     vote_type=vote.vote_type,
                 )
                 for vote in feedback.votes
@@ -56,12 +57,12 @@ class Feedback(Base):
 
     def to_domain(self) -> FeedbackEntity:
         return FeedbackEntity(
-            id=str(self.id),
-            course_id=str(self.course_id),
-            author_id=str(self.author_id),
+            id=UUID(str(self.id)),
+            course_id=UUID(str(self.course_id)),
+            author_id=UUID(str(self.author_id)),
             text=FeedbackText(self.content),
             rating=Rating(self.rating),
-            votes={Vote(user_id=str(vote.user_id), vote_type=vote.vote_type) for vote in self.votes},
+            votes={Vote(user_id=UUID(str(vote.user_id)), vote_type=vote.vote_type) for vote in self.votes},
             date=self.date,
         )
 
@@ -81,9 +82,9 @@ class VoteForFeedback(Base):
     )
 
     @staticmethod
-    def from_domain(vote: Vote, feedback_id: str) -> VoteForFeedback:
+    def from_domain(vote: Vote, feedback_id: UUID) -> VoteForFeedback:
         return VoteForFeedback(
-           feedback_id=uuid.UUID(feedback_id),
-           user_id=uuid.UUID(vote.user_id),
+           feedback_id=uuid.UUID(feedback_id.value),
+           user_id=uuid.UUID(vote.user_id.value),
            vote_type=vote.vote_type,
         )

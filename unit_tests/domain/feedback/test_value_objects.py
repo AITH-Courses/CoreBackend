@@ -1,5 +1,8 @@
+import uuid
+
 import pytest
 
+from src.domain.base_value_objects import UUID
 from src.domain.courses.exceptions import EmptyPropertyError, ValueDoesntExistError
 from src.domain.feedback.value_objects import FeedbackText, Vote, Rating
 
@@ -27,13 +30,13 @@ def test_incorrect_feedback_rating():
 
 
 def test_correct_vote():
-    user_id_string = "32424151"
+    user_id = UUID(str(uuid.uuid4()))
     vote_type_string = "like"
-    vote = Vote(user_id_string, vote_type_string)
+    vote = Vote(user_id, vote_type_string)
     assert vote.vote_type == vote_type_string
-    assert vote.user_id == user_id_string
+    assert vote.user_id == user_id
 
 
 def test_incorrect_vote():
     with pytest.raises(ValueDoesntExistError):
-        Vote("324234", "unlike")
+        Vote(UUID(str(uuid.uuid4())), "unlike")

@@ -1,10 +1,8 @@
 import pytest
 
-from src.domain.auth.exceptions import EmailNotValidError, RoleDoesntExistError, EmptyPartOfNameError
-from src.domain.auth.value_objects import Email, USER_ROLES, UserRole, PartOfName
 from src.domain.courses.exceptions import EmptyPropertyError, ValueDoesntExistError, IncorrectCourseRunNameError
 from src.domain.courses.value_objects import CourseName, Author, Implementer, Format, CourseRun
-from src.domain.courses.constants import IMPLEMENTERS, FORMATS, TERMS, ROLES, PERIODS
+from src.domain.courses.constants import IMPLEMENTERS, FORMATS
 
 
 def test_correct_course_name():

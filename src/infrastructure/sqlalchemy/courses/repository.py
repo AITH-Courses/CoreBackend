@@ -13,6 +13,7 @@ from src.infrastructure.sqlalchemy.courses.models import Course, PeriodForCourse
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
 
+    from src.domain.base_value_objects import UUID
     from src.domain.courses.entities import CourseEntity
 
 
@@ -60,25 +61,25 @@ class SQLAlchemyCourseRepository(ICourseRepository):
         course_ = await self.__get_by_id(course.id)
         course_.is_draft = course.is_draft
 
-    async def delete(self, course_id: str) -> None:
+    async def delete(self, course_id: UUID) -> None:
         course_ = await self.__get_by_id(course_id)
         course_.is_archive = True  # many related data
         course_.name = f"{course_.name} - {course_.id}"  # to avoid unique name after creating new course
 
-    async def get_by_id(self, course_id: str) -> CourseEntity:
+    async def get_by_id(self, course_id: UUID) -> CourseEntity:
         try:
             course_ = await self.__get_by_id(course_id)
             return course_.to_domain()
         except NoResultFound as ex:
             raise CourseNotFoundError from ex
 
-    async def __get_by_id(self, course_id: str) -> Course:
+    async def __get_by_id(self, course_id: UUID) -> Course:
         query = (
             select(Course)
             .options(joinedload(Course.roles))
             .options(joinedload(Course.periods))
             .options(joinedload(Course.runs))
-            .filter_by(id=course_id, is_archive=False)
+            .filter_by(id=course_id.value, is_archive=False)
         )
         try:
             result = await self.session.execute(query)

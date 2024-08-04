@@ -6,6 +6,7 @@ from sqlalchemy.orm import Mapped, mapped_column
 
 from src.domain.auth.entities import UserEntity
 from src.domain.auth.value_objects import Email, PartOfName, UserRole
+from src.domain.base_value_objects import UUID
 from src.infrastructure.sqlalchemy.session import Base
 
 
@@ -31,7 +32,7 @@ class User(Base):
 
     def to_domain(self) -> UserEntity:
         return UserEntity(
-            id=str(self.id),
+            id=UUID(str(self.id)),
             firstname=PartOfName(self.firstname),
             lastname=PartOfName(self.lastname),
             role=UserRole(self.role),
@@ -42,7 +43,7 @@ class User(Base):
     @staticmethod
     def from_domain(user: UserEntity) -> "User":
         return User(
-            id=str(user.id),
+            id=user.id.value,
             firstname=user.firstname.value,
             lastname=user.lastname.value,
             role=user.role.value,

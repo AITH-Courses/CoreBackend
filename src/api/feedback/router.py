@@ -40,18 +40,19 @@ router = APIRouter(prefix="/courses", tags=["courses"])
 )
 async def get_feedbacks(
     course_id: str,
-    user_or_anonym: UserDTO = Depends(get_user_or_anonym),
+    user: UserDTO | None = Depends(get_user_or_anonym),
     query_service:  FeedbackQueryService = Depends(get_feedback_query_service),
 ) -> list[FeedbackDTO]:
     """Get feedbacks.
 
+    :param user:
     :param course_id:
-    :param user_or_anonym:
     :param query_service:
     :return:
     """
     feedbacks = await query_service.get_feedbacks_by_course_id(course_id)
-    return [FeedbackDTO.from_domain(feedback, user_or_anonym.id) for feedback in feedbacks]
+
+    return [FeedbackDTO.from_domain(feedback, None if user is None else user.id) for feedback in feedbacks]
 
 
 @router.post(
@@ -93,7 +94,7 @@ async def create_feedback(
     """
     try:
         feedback_id = await command_service.create_feedback(course_id, user.id, data.text, data.rating)
-        await query_service.feedback_cache_service.delete_many(course_id)
+        await query_service.invalidate_course(course_id)
         return JSONResponse(
             content=CreateFeedbackResponse(feedback_id=feedback_id).model_dump(),
             status_code=status.HTTP_201_CREATED,
@@ -142,7 +143,6 @@ async def delete_feedback(
 
     :param course_id:
     :param feedback_id:
-    :param data:
     :param user:
     :param command_service:
     :param query_service:
@@ -150,7 +150,7 @@ async def delete_feedback(
     """
     try:
         await command_service.delete_feedback(feedback_id, user.id)
-        await query_service.feedback_cache_service.delete_many(course_id)
+        await query_service.invalidate_course(course_id)
         return JSONResponse(
             content=SuccessResponse(message="Отзыв успешно удален").model_dump(),
             status_code=status.HTTP_200_OK,
@@ -210,7 +210,7 @@ async def unvote_feedback(
     """
     try:
         await command_service.unvote(feedback_id, user.id)
-        await query_service.feedback_cache_service.delete_many(course_id)
+        await query_service.invalidate_course(course_id)
         return JSONResponse(
             content=SuccessResponse(message="Оценка с отзыва убрана").model_dump(),
             status_code=status.HTTP_200_OK,
@@ -277,7 +277,7 @@ async def vote_feedback(
     """
     try:
         await command_service.vote(feedback_id, user.id, data.vote_type)
-        await query_service.feedback_cache_service.delete_many(course_id)
+        await query_service.invalidate_course(course_id)
         return JSONResponse(
             content=SuccessResponse(message="Оценка отзыва выполнена").model_dump(),
             status_code=status.HTTP_200_OK,

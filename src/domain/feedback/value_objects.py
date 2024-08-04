@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+from src.domain.base_value_objects import UUID
 from src.domain.courses.exceptions import EmptyPropertyError, ValueDoesntExistError
 from src.domain.feedback.contants import MAX_RATING_VALUE, MIN_RATING_VALUE, VOTE_TYPES
 
@@ -9,10 +10,10 @@ class Vote:
 
     """Name of course as a value object."""
 
-    user_id: str
+    user_id: UUID
     vote_type: str
 
-    def __init__(self, user_id: str, vote_type: str) -> None:
+    def __init__(self, user_id: UUID, vote_type: str) -> None:
         """Initialize object."""
         if vote_type not in VOTE_TYPES:
             raise ValueDoesntExistError(property_name="vote type")

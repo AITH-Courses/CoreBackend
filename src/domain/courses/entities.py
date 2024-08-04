@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 from src.domain.courses.exceptions import CoursePublishError
 
 if TYPE_CHECKING:
+    from src.domain.base_value_objects import UUID
     from src.domain.courses.value_objects import Author, CourseName, CourseRun, Format, Implementer, Period, Role, Terms
 
 
@@ -14,7 +15,7 @@ class CourseEntity:
 
     """Entity of course."""
 
-    id: str
+    id: UUID
     name: CourseName
     image_url: str | None = field(default=None)
     limits: int | None = field(default=None)

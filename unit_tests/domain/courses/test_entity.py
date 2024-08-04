@@ -1,5 +1,8 @@
+import uuid
+
 import pytest
 
+from src.domain.base_value_objects import UUID
 from src.domain.courses.entities import CourseEntity
 from src.domain.courses.exceptions import CoursePublishError
 from src.domain.courses.constants import IMPLEMENTERS, ROLES, FORMATS, PERIODS, TERMS
@@ -7,11 +10,12 @@ from src.domain.courses.value_objects import CourseName, Author, Implementer, Fo
 
 
 def test_correct_course():
+    course_id = UUID(str(uuid.uuid4()))
     course = CourseEntity(
-        id="fs4sdg4gs",
+        id=course_id,
         name=CourseName("Java"),
     )
-    assert course.id == "fs4sdg4gs"
+    assert course.id == course_id
     assert course.name == CourseName("Java")
     assert course.image_url is None
     assert len(course.roles) != []
@@ -19,7 +23,7 @@ def test_correct_course():
 
 def test_publish_empty_course():
     course = CourseEntity(
-        id="fs4sdg4gs",
+        id=UUID(str(uuid.uuid4())),
         name=CourseName("Java"),
     )
     with pytest.raises(CoursePublishError):
@@ -28,7 +32,7 @@ def test_publish_empty_course():
 
 def test_publish_already_published_course():
     course = CourseEntity(
-        id="fs4sdg4gs",
+        id=UUID(str(uuid.uuid4())),
         name=CourseName("Java"),
         is_draft=False
     )
@@ -38,7 +42,7 @@ def test_publish_already_published_course():
 
 def test_publish_full_course():
     course = CourseEntity(
-        id="fs4sdg4gs",
+        id=UUID(str(uuid.uuid4())),
         name=CourseName("Java"),
         image_url="path-to-logo.jpg",
         author=Author("Иванов И. И."),
@@ -55,7 +59,7 @@ def test_publish_full_course():
 
 def test_hide_draft_course():
     course = CourseEntity(
-        id="fs4sdg4gs",
+        id=UUID(str(uuid.uuid4())),
         name=CourseName("Java"),
         image_url="path-to-logo.jpg",
         author=Author("Иванов И. И."),
@@ -71,7 +75,7 @@ def test_hide_draft_course():
 
 def test_hide_published_course():
     course = CourseEntity(
-        id="fs4sdg4gs",
+        id=UUID(str(uuid.uuid4())),
         name=CourseName("Java"),
         is_draft=False
     )

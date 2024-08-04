@@ -13,6 +13,7 @@ from src.infrastructure.sqlalchemy.feedback.models import Feedback, VoteForFeedb
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
 
+    from src.domain.base_value_objects import UUID
     from src.domain.feedback.entities import FeedbackEntity
 
 
@@ -35,19 +36,19 @@ class SQLAlchemyFeedbackRepository(IFeedbackRepository):
         for vote in feedback.votes:
             self.session.add(VoteForFeedback.from_domain(vote, feedback.id))
 
-    async def delete(self, feedback_id: str) -> None:
+    async def delete(self, feedback_id: UUID) -> None:
         feedback_ = await self.__get_by_id(feedback_id)
         feedback_.is_archive = True  # to avoid cascade deleting
 
-    async def get_one_by_id(self, feedback_id: str) -> FeedbackEntity:
+    async def get_one_by_id(self, feedback_id: UUID) -> FeedbackEntity:
         feedback_ = await self.__get_by_id(feedback_id)
         return feedback_.to_domain()
 
-    async def __get_by_id(self, feedback_id: str) -> Feedback:
+    async def __get_by_id(self, feedback_id: UUID) -> Feedback:
         query = (
             select(Feedback)
             .options(joinedload(Feedback.votes))
-            .filter_by(id=feedback_id, is_archive=False)
+            .filter_by(id=feedback_id.value, is_archive=False)
         )
         try:
             result = await self.session.execute(query)
@@ -55,10 +56,10 @@ class SQLAlchemyFeedbackRepository(IFeedbackRepository):
         except NoResultFound as ex:
             raise FeedbackNotFoundError from ex
 
-    async def __check_one_by_user_id_and_course_id(self, author_id: str, course_id: str) -> None:
+    async def __check_one_by_user_id_and_course_id(self, author_id: UUID, course_id: UUID) -> None:
         query = (
             select(Feedback.id)
-            .filter_by(author_id=author_id, course_id=course_id, is_archive=False)
+            .filter_by(author_id=author_id.value, course_id=course_id.value, is_archive=False)
         )
         try:
             result = await self.session.execute(query)
@@ -68,11 +69,11 @@ class SQLAlchemyFeedbackRepository(IFeedbackRepository):
         except NoResultFound:
             pass
 
-    async def get_all_by_course_id(self, course_id: str) -> list[FeedbackEntity]:
+    async def get_all_by_course_id(self, course_id: UUID) -> list[FeedbackEntity]:
         query = (
             select(Feedback)
             .options(joinedload(Feedback.votes))
-            .filter_by(course_id=course_id, is_archive=False)
+            .filter_by(course_id=course_id.value, is_archive=False)
             .order_by(Feedback.date.desc())
         )
         result = await self.session.execute(query)

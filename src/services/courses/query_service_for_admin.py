@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from src.domain.base_value_objects import UUID
+
 if TYPE_CHECKING:
     from src.domain.courses.course_repository import ICourseRepository
     from src.domain.courses.entities import CourseEntity
@@ -17,6 +19,7 @@ class AdminCourseQueryService:
         self.course_cache_service = course_cache_service
 
     async def get_course(self, course_id: str) -> CourseEntity:
+        course_id = UUID(course_id)
         course_from_cache = await self.course_cache_service.get_one(course_id)
         if course_from_cache:
             return course_from_cache
@@ -31,3 +34,7 @@ class AdminCourseQueryService:
         courses = await self.course_repo.get_all()
         await self.course_cache_service.set_many(courses)
         return courses
+
+    async def invalidate_course(self, course_id: str) -> None:
+        await self.course_cache_service.delete_one(UUID(course_id))
+        await self.course_cache_service.delete_many()

@@ -4,8 +4,8 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from src.domain.base_value_objects import UUID
     from src.domain.courses.entities import CourseEntity
-
 
 class ICourseRepository(ABC):
 
@@ -24,11 +24,11 @@ class ICourseRepository(ABC):
         raise NotImplementedError
 
     @abstractmethod
-    async def delete(self, course_id: str) -> None:
+    async def delete(self, course_id: UUID) -> None:
         raise NotImplementedError
 
     @abstractmethod
-    async def get_by_id(self, course_id: str) -> CourseEntity:
+    async def get_by_id(self, course_id: UUID) -> CourseEntity:
         raise NotImplementedError
 
     @abstractmethod

@@ -1,8 +1,11 @@
+import uuid
+
 import pytest
 
 from src.domain.auth.entities import UserEntity
 from src.domain.auth.exceptions import UserBySessionNotFoundError
 from src.domain.auth.value_objects import PartOfName, UserRole, Email
+from src.domain.base_value_objects import UUID
 from src.infrastructure.redis.auth.session_service import RedisSessionService
 
 
@@ -14,7 +17,7 @@ def redis_session_service(test_cache_session):
 async def test_set_get_user(redis_session_service):
     auth_token = "auth-token"
     user = UserEntity(
-        id="1",
+        id=UUID(str(uuid.uuid4())),
         firstname=PartOfName("Nick"),
         lastname=PartOfName("Cargo"),
         role=UserRole("admin"),
@@ -41,7 +44,7 @@ async def test_no_user(redis_session_service):
 async def test_delete_user(redis_session_service):
     auth_token = "auth-token"
     user = UserEntity(
-        id="1",
+        id=UUID(str(uuid.uuid4())),
         firstname=PartOfName("Nick"),
         lastname=PartOfName("Cargo"),
         role=UserRole("admin"),
@@ -57,7 +60,7 @@ async def test_delete_user(redis_session_service):
 async def test_update_user(redis_session_service):
     auth_token = "auth-token"
     user = UserEntity(
-        id="1",
+        id=UUID(str(uuid.uuid4())),
         firstname=PartOfName("Nick"),
         lastname=PartOfName("Cargo"),
         role=UserRole("admin"),
@@ -66,7 +69,7 @@ async def test_update_user(redis_session_service):
     )
     await redis_session_service.set(auth_token, user)
     updated_user = UserEntity(
-        id="1",
+        id=UUID(str(uuid.uuid4())),
         firstname=PartOfName("Carl"),
         lastname=PartOfName("Cargo"),
         role=UserRole("admin"),

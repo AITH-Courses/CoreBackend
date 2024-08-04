@@ -4,6 +4,7 @@ from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from src.domain.base_value_objects import UUID
     from src.domain.courses.entities import CourseEntity
 
 
@@ -12,11 +13,11 @@ class CourseCacheService(ABC):
     """Base class for cache of course as service."""
 
     @abstractmethod
-    async def get_one(self, course_id: str) -> CourseEntity | None:
+    async def get_one(self, course_id: UUID) -> CourseEntity | None:
         raise NotImplementedError
 
     @abstractmethod
-    async def delete_one(self, course_id: str) -> None:
+    async def delete_one(self, course_id: UUID) -> None:
         raise NotImplementedError
 
     @abstractmethod

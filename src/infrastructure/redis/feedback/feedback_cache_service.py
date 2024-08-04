@@ -5,6 +5,7 @@ import json
 from json.decoder import JSONDecodeError
 from typing import TYPE_CHECKING
 
+from src.domain.base_value_objects import UUID
 from src.domain.feedback.entities import FeedbackEntity
 from src.domain.feedback.value_objects import FeedbackText, Rating, Vote
 from src.infrastructure.redis.feedback.constants import TIME_TO_LIVE_FEEDBACKS
@@ -22,34 +23,34 @@ class RedisFeedbackCacheService(FeedbackCacheService):
         self.session = session
 
     @staticmethod
-    def feedback_key(course_id: str) -> str:
-        return "course_" + course_id + "_feedbacks"
+    def feedback_key(course_id: UUID) -> str:
+        return "course_" + course_id.value + "_feedbacks"
 
     @staticmethod
     def __from_domain_to_dict(feedback: FeedbackEntity) -> dict:
         return {
-            "id": feedback.id,
-            "course_id": feedback.course_id,
-            "author_id": feedback.author_id,
+            "id": feedback.id.value,
+            "course_id": feedback.course_id.value,
+            "author_id": feedback.author_id.value,
             "text": feedback.text.value,
             "rating": feedback.rating.value,
-            "votes": [{"user_id": vote.user_id, "vote_type": vote.vote_type} for vote in feedback.votes],
+            "votes": [{"user_id": vote.user_id.value, "vote_type": vote.vote_type} for vote in feedback.votes],
             "date": feedback.date.strftime("%Y-%m-%d"),
         }
 
     @staticmethod
     def __from_dict_to_domain(feedback_: dict) -> FeedbackEntity:
         return FeedbackEntity(
-            id=feedback_["id"],
-            course_id=feedback_["course_id"],
-            author_id=feedback_["author_id"],
+            id=UUID(feedback_["id"]),
+            course_id=UUID(feedback_["course_id"]),
+            author_id=UUID(feedback_["author_id"]),
             text=FeedbackText(feedback_["text"]),
             rating=Rating(feedback_["rating"]),
-            votes={Vote(vote["user_id"], vote["vote_type"]) for vote in feedback_["votes"]},
+            votes={Vote(UUID(vote["user_id"]), vote["vote_type"]) for vote in feedback_["votes"]},
             date=datetime.date.fromisoformat(feedback_["date"]),
         )
 
-    async def get_many_by_course_id(self, course_id: str) -> list[FeedbackEntity] | None:
+    async def get_many_by_course_id(self, course_id: UUID) -> list[FeedbackEntity] | None:
         try:
             feedbacks_key = self.feedback_key(course_id)
             feedbacks_data_string = await self.session.get(feedbacks_key)
@@ -58,11 +59,11 @@ class RedisFeedbackCacheService(FeedbackCacheService):
         except (TypeError, JSONDecodeError):  # no such key in Redis
             return None
 
-    async def delete_many(self, course_id: str) -> None:
+    async def delete_many(self, course_id: UUID) -> None:
         feedbacks_key = self.feedback_key(course_id)
         await self.session.delete(feedbacks_key)
 
-    async def set_many(self, course_id: str, feedbacks: list[FeedbackEntity]) -> None:
+    async def set_many(self, course_id: UUID, feedbacks: list[FeedbackEntity]) -> None:
         feedbacks_key = self.feedback_key(course_id)
         feedbacks_data = [self.__from_domain_to_dict(feedback) for feedback in feedbacks]
         course_data_string = json.dumps(feedbacks_data)

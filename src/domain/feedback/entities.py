@@ -2,31 +2,34 @@ from __future__ import annotations
 
 import datetime
 from dataclasses import dataclass, field
+from typing import TYPE_CHECKING
 
 from src.domain.feedback.exceptions import FeedbackLikeError
 from src.domain.feedback.value_objects import FeedbackText, Rating, Vote
 
+if TYPE_CHECKING:
+    from src.domain.base_value_objects import UUID
 
 @dataclass
 class FeedbackEntity:
 
     """Entity of feedback."""
 
-    id: str
-    course_id: str
-    author_id: str
+    id: UUID
+    course_id: UUID
+    author_id: UUID
     text: FeedbackText
     rating: Rating
     votes: set[Vote] = field(default_factory=list)
     date: datetime.date = field(default_factory=datetime.date.today)
 
-    def unvote(self, user_id: str) -> None:
+    def unvote(self, user_id: UUID) -> None:
         vote = Vote(user_id, "like")
         alternative_vote = Vote(user_id, "dislike")
         self.votes.discard(vote)
         self.votes.discard(alternative_vote)
 
-    def vote(self, user_id: str, vote_type: str) -> None:
+    def vote(self, user_id: UUID, vote_type: str) -> None:
         alternative_vote_type = "dislike" if vote_type == "like" else "like"
         alternative_vote = Vote(user_id, alternative_vote_type)
         vote = Vote(user_id, vote_type)

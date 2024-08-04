@@ -1,10 +1,13 @@
+import uuid
+
 from src.domain.auth.entities import UserEntity
 from src.domain.auth.value_objects import PartOfName, UserRole, Email
+from src.domain.base_value_objects import UUID
 
 
 def test_correct_user():
     user = UserEntity(
-        id="123sf23r2f2341",
+        id=UUID(str(uuid.uuid4())),
         firstname=PartOfName("Nick"),
         lastname=PartOfName("Cargo"),
         role=UserRole("admin"),

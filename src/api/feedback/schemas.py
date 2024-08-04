@@ -1,8 +1,14 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from pydantic import BaseModel, Field
 
-from src.domain.feedback.entities import FeedbackEntity
+from src.domain.base_value_objects import UUID
 from src.domain.feedback.value_objects import Vote
 
+if TYPE_CHECKING:
+    from src.domain.feedback.entities import FeedbackEntity
 
 class FeedbackDTO(BaseModel):
 
@@ -18,14 +24,14 @@ class FeedbackDTO(BaseModel):
     reputation: int = Field(3)
 
     @staticmethod
-    def from_domain(feedback: FeedbackEntity, user_id: str) -> "FeedbackDTO":
+    def from_domain(feedback: FeedbackEntity, user_id: str | None) -> FeedbackDTO:
         return FeedbackDTO(
-            id=feedback.id,
+            id=feedback.id.value,
             text=feedback.text.value,
             rating=feedback.rating.value,
-            is_author=feedback.author_id == user_id,
-            liked_by_user=Vote(user_id, "like") in feedback.votes,
-            disliked_by_user=Vote(user_id, "dislike") in feedback.votes,
+            is_author=False if user_id is None else feedback.author_id == user_id,
+            liked_by_user=False if user_id is None else Vote(UUID(user_id), "like") in feedback.votes,
+            disliked_by_user=False if user_id is None else Vote(UUID(user_id), "dislike") in feedback.votes,
             date=feedback.date.strftime("%Y-%m-%d"),
             reputation=feedback.reputation,
         )

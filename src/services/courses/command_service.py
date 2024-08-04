@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 
 from sqlalchemy.exc import IntegrityError
 
+from src.domain.base_value_objects import UUID
 from src.domain.courses.entities import CourseEntity
 from src.domain.courses.exceptions import CourseAlreadyExistsError, CourseNotFoundError
 from src.domain.courses.value_objects import Author, CourseName, CourseRun, Format, Implementer, Period, Role, Terms
@@ -21,7 +22,7 @@ class CourseCommandService:
         self.uow = uow
 
     async def create_course(self, name_: str) -> str:
-        course_id = str(uuid.uuid4())
+        course_id = UUID(str(uuid.uuid4()))
         name = CourseName(name_)
         course = CourseEntity(course_id, name)
         try:
@@ -33,7 +34,7 @@ class CourseCommandService:
         except Exception:
             await self.uow.rollback()
             raise
-        return course_id
+        return course_id.value
 
     async def update_course(
             self, course_id: str, name_: str, image_url: str | None, limits_: int | None,
@@ -43,7 +44,7 @@ class CourseCommandService:
             terms_: str | None, roles: list[str], periods: list[str], runs: list[str],
     ) -> None:
         course = CourseEntity(
-            id=str(course_id),
+            id=UUID(str(course_id)),
             name=CourseName(name_),
             image_url=image_url,
             limits=limits_,
@@ -72,6 +73,7 @@ class CourseCommandService:
             raise
 
     async def delete_course(self, course_id: str) -> None:
+        course_id = UUID(course_id)
         try:
             await self.uow.course_repo.delete(course_id)
             await self.uow.commit()
@@ -80,6 +82,7 @@ class CourseCommandService:
             raise
 
     async def publish_course(self, course_id: str) -> None:
+        course_id = UUID(course_id)
         try:
             course = await self.uow.course_repo.get_by_id(course_id)
             course.publish()
@@ -90,6 +93,7 @@ class CourseCommandService:
             raise
 
     async def hide_course(self, course_id: str) -> None:
+        course_id = UUID(course_id)
         try:
             course = await self.uow.course_repo.get_by_id(course_id)
             course.hide()

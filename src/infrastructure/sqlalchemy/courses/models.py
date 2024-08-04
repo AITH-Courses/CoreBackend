@@ -6,6 +6,7 @@ import uuid
 from sqlalchemy import ForeignKey, Text, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
+from src.domain.base_value_objects import UUID
 from src.domain.courses.entities import CourseEntity
 from src.domain.courses.value_objects import Author, CourseName, CourseRun, Format, Implementer, Period, Role, Terms
 from src.infrastructure.sqlalchemy.session import Base
@@ -51,7 +52,7 @@ class Course(Base):
     @staticmethod
     def from_domain(course: CourseEntity) -> Course:
         return Course(
-            id=course.id,
+            id=course.id.value,
             name=course.name.value,
             image_url=course.image_url,
             limits=course.limits,
@@ -73,7 +74,7 @@ class Course(Base):
     def to_domain(self) -> CourseEntity:
         course_ = self
         return CourseEntity(
-            id=str(course_.id),
+            id=UUID(str(course_.id)),
             name=CourseName(course_.name),
             image_url=course_.image_url,
             limits=course_.limits,

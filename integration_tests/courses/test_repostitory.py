@@ -3,6 +3,7 @@ import uuid
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.domain.base_value_objects import UUID
 from src.domain.courses.constants import PERIODS, ROLES
 from src.domain.courses.entities import CourseEntity
 from src.domain.courses.exceptions import CourseNotFoundError
@@ -10,9 +11,9 @@ from src.domain.courses.value_objects import CourseName, Period, Role, CourseRun
 from src.infrastructure.sqlalchemy.courses.repository import SQLAlchemyCourseRepository
 
 
-async def create_course(async_session: AsyncSession) -> tuple[str, SQLAlchemyCourseRepository]:
+async def create_course(async_session: AsyncSession) -> tuple[UUID, SQLAlchemyCourseRepository]:
     repo = SQLAlchemyCourseRepository(async_session)
-    course_id = str(uuid.uuid4())
+    course_id = UUID(str(uuid.uuid4()))
     await repo.create(CourseEntity(
         id=course_id,
         name=CourseName("Алгоритмизация")
@@ -91,4 +92,3 @@ async def test_update_course_after_delete(test_async_session: AsyncSession):
         )
         await repo.update(update_course)
         await test_async_session.commit()
-

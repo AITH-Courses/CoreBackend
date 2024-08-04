@@ -1,7 +1,9 @@
+from __future__ import annotations
+
+from typing import TYPE_CHECKING
+
 from fastapi import Depends, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
-from redis.asyncio import Redis
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.api.auth.schemas import UserDTO
 from src.domain.auth.exceptions import UserBySessionNotFoundError
@@ -11,6 +13,10 @@ from src.infrastructure.redis.session import get_redis_session
 from src.infrastructure.sqlalchemy.session import get_async_session
 from src.infrastructure.sqlalchemy.users.unit_of_work import SQLAlchemyAuthUnitOfWork
 from src.services.auth.command_service import AuthCommandService
+
+if TYPE_CHECKING:
+    from redis.asyncio import Redis
+    from sqlalchemy.ext.asyncio import AsyncSession
 
 
 def get_auth_service(
@@ -55,7 +61,7 @@ async def get_user(
     try:
         user = await auth_service.me(auth_token)
         return UserDTO(
-            id=user.id,
+            id=user.id.value,
             firstname=user.firstname.value,
             lastname=user.lastname.value,
             email=user.email.value,
@@ -71,26 +77,20 @@ async def get_user(
 async def get_user_or_anonym(
         credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer(auto_error=False)),
         auth_service: AuthCommandService = Depends(get_auth_service),
-) -> UserDTO:
+) -> UserDTO | None:
     """Get user on auth token or anonym.
 
     :param credentials:
     :param auth_service:
     :return:
     """
-    anonym = UserDTO(
-        id="anonym",
-        firstname="anonym",
-        lastname="anonym",
-        email="anonym",
-        role="anonym",
-    )
+    anonym = None
     try:
         if not credentials:
             return anonym
         user = await auth_service.me(credentials.credentials)
         return UserDTO(
-            id=user.id,
+            id=user.id.value,
             firstname=user.firstname.value,
             lastname=user.lastname.value,
             email=user.email.value,

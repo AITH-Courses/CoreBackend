@@ -4,17 +4,18 @@ import uuid
 import pytest
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.domain.base_value_objects import UUID
 from src.domain.feedback.entities import FeedbackEntity
 from src.domain.feedback.exceptions import FeedbackNotFoundError
 from src.domain.feedback.value_objects import FeedbackText, Rating
 from src.infrastructure.sqlalchemy.feedback.repository import SQLAlchemyFeedbackRepository
 
 
-async def create_feedback(async_session: AsyncSession) -> tuple[str, str, str, SQLAlchemyFeedbackRepository]:
+async def create_feedback(async_session: AsyncSession) -> tuple[UUID, UUID, UUID, SQLAlchemyFeedbackRepository]:
     repo = SQLAlchemyFeedbackRepository(async_session)
-    feedback_id = str(uuid.uuid4())
-    course_id = str(uuid.uuid4())
-    author_id = str(uuid.uuid4())
+    feedback_id = UUID(str(uuid.uuid4()))
+    course_id = UUID(str(uuid.uuid4()))
+    author_id = UUID(str(uuid.uuid4()))
     await repo.create(FeedbackEntity(
         id=feedback_id,
         course_id=course_id,
@@ -38,11 +39,12 @@ async def test_create_feedback(test_async_session: AsyncSession):
 
 async def test_get_many_feedbacks(test_async_session: AsyncSession):
     feedback_1_id, course_id, author_id, repo = await create_feedback(test_async_session)
-    feedback_2_id = str(uuid.uuid4())
+    feedback_2_id = UUID(str(uuid.uuid4()))
+    another_author_id = UUID(str(uuid.uuid4()))
     await repo.create(FeedbackEntity(
         id=feedback_2_id,
         course_id=course_id,
-        author_id=author_id,
+        author_id=another_author_id,
         text=FeedbackText("Cool 2"),
         rating=Rating(5),
         date=datetime.date.today() + datetime.timedelta(days=1)
@@ -57,8 +59,8 @@ async def test_get_many_feedbacks(test_async_session: AsyncSession):
 async def test_add_votes(test_async_session: AsyncSession):
     feedback_id, _, _, repo = await create_feedback(test_async_session)
     feedback = await repo.get_one_by_id(feedback_id)
-    feedback.vote(str(uuid.uuid4()), "like")
-    feedback.vote(str(uuid.uuid4()), "dislike")
+    feedback.vote(UUID(str(uuid.uuid4())), "like")
+    feedback.vote(UUID(str(uuid.uuid4())), "dislike")
     await repo.update_votes(feedback)
     await test_async_session.commit()
 

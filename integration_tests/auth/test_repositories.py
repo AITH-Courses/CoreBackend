@@ -6,12 +6,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.domain.auth.entities import UserEntity
 from src.domain.auth.exceptions import UserNotFoundError
 from src.domain.auth.value_objects import PartOfName, UserRole, Email
+from src.domain.base_value_objects import UUID
 from src.infrastructure.sqlalchemy.users.repository import SQLAlchemyUserRepository
 
 
-async def create_user(async_session: AsyncSession) -> tuple[str, SQLAlchemyUserRepository]:
+async def create_user(async_session: AsyncSession) -> tuple[UUID, SQLAlchemyUserRepository]:
     repo = SQLAlchemyUserRepository(async_session)
-    user_id = str(uuid.uuid4())
+    user_id = UUID(str(uuid.uuid4()))
     await repo.create(UserEntity(
         id=user_id,
         firstname=PartOfName("Nick"),

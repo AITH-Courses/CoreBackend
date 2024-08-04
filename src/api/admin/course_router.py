@@ -18,12 +18,12 @@ from src.domain.courses.exceptions import (
     IncorrectCourseRunNameError,
     ValueDoesntExistError,
 )
-from src.services.courses.query_service_for_talent import TalentCourseQueryService
 
 if TYPE_CHECKING:
     from src.api.auth.schemas import UserDTO
     from src.services.courses.command_service import CourseCommandService
     from src.services.courses.query_service_for_admin import AdminCourseQueryService
+    from src.services.courses.query_service_for_talent import TalentCourseQueryService
 
 
 router = APIRouter(prefix="/admin", tags=["admin"])
@@ -142,8 +142,8 @@ async def update_course(
             terms_=data.terms, roles=data.roles,
             periods=data.periods, runs=data.last_runs,
         )
-        await admin_query_service.course_cache_service.delete_one(course_id)
-        await talent_query_service.course_cache_service.delete_one(course_id)
+        await admin_query_service.invalidate_course(course_id)
+        await talent_query_service.invalidate_course(course_id)
         await admin_query_service.course_cache_service.delete_many()
         await talent_query_service.course_cache_service.delete_many()
         return JSONResponse(
@@ -202,10 +202,8 @@ async def delete_course(
     """
     try:
         await command_service.delete_course(course_id)
-        await admin_query_service.course_cache_service.delete_one(course_id)
-        await talent_query_service.course_cache_service.delete_one(course_id)
-        await admin_query_service.course_cache_service.delete_many()
-        await talent_query_service.course_cache_service.delete_many()
+        await admin_query_service.invalidate_course(course_id)
+        await talent_query_service.invalidate_course(course_id)
         return JSONResponse(
             content=SuccessResponse(message="Course has deleted").model_dump(),
             status_code=status.HTTP_200_OK,
@@ -325,10 +323,8 @@ async def publish_course(
     """
     try:
         await command_service.publish_course(course_id)
-        await admin_query_service.course_cache_service.delete_one(course_id)
-        await talent_query_service.course_cache_service.delete_one(course_id)
-        await admin_query_service.course_cache_service.delete_many()
-        await talent_query_service.course_cache_service.delete_many()
+        await admin_query_service.invalidate_course(course_id)
+        await talent_query_service.invalidate_course(course_id)
         return JSONResponse(
             content=SuccessResponse(message="Course has published").model_dump(),
             status_code=status.HTTP_200_OK,
@@ -384,10 +380,8 @@ async def hide_course(
     """
     try:
         await command_service.hide_course(course_id)
-        await admin_query_service.course_cache_service.delete_one(course_id)
-        await talent_query_service.course_cache_service.delete_one(course_id)
-        await admin_query_service.course_cache_service.delete_many()
-        await talent_query_service.course_cache_service.delete_many()
+        await admin_query_service.invalidate_course(course_id)
+        await talent_query_service.invalidate_course(course_id)
         return JSONResponse(
             content=SuccessResponse(message="Course has unpublished").model_dump(),
             status_code=status.HTTP_200_OK,

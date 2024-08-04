@@ -1,18 +1,20 @@
+import uuid
+
 import pytest
 
+from src.domain.base_value_objects import UUID
 from src.domain.courses.entities import CourseEntity
-from src.domain.auth.exceptions import UserBySessionNotFoundError
 from src.domain.courses.value_objects import CourseName, CourseRun
 from src.infrastructure.redis.courses.course_cache_service import RedisCourseCacheService
 
 
 @pytest.fixture(scope='function')
 def redis_course_cache_service(test_cache_session):
-    return RedisCourseCacheService(test_cache_session)
+    return RedisCourseCacheService(test_cache_session, "test")
 
 
 async def test_operations_with_one_course(redis_course_cache_service):
-    course_id = "ds3ffa4fs5dgw3r"
+    course_id = UUID(str(uuid.uuid4()))
     course = CourseEntity(
         id=course_id,
         name=CourseName("Алгоритмизация"),
@@ -37,11 +39,11 @@ async def test_operations_with_one_course(redis_course_cache_service):
 
 async def test_operations_with_all_courses(redis_course_cache_service):
     course_1 = CourseEntity(
-        id="24fsf4sg5ghs",
+        id=UUID(str(uuid.uuid4())),
         name=CourseName("Алгоритмизация")
     )
     course_2 = CourseEntity(
-        id="gd4fga3d5afa1f",
+        id=UUID(str(uuid.uuid4())),
         name=CourseName("Java")
     )
     await redis_course_cache_service.set_many([course_1, course_2])
@@ -54,4 +56,4 @@ async def test_operations_with_all_courses(redis_course_cache_service):
     await redis_course_cache_service.delete_many()
 
     deleted_courses = await redis_course_cache_service.get_many()
-    assert len(deleted_courses) ==0
+    assert deleted_courses is None

@@ -4,6 +4,7 @@ import json
 from json.decoder import JSONDecodeError
 from typing import TYPE_CHECKING, Literal
 
+from src.domain.base_value_objects import UUID
 from src.domain.courses.entities import CourseEntity
 from src.domain.courses.value_objects import Author, CourseName, CourseRun, Format, Implementer, Period, Role, Terms
 from src.infrastructure.redis.courses.constants import TIME_TO_LIVE_ALL_COURSES, TIME_TO_LIVE_ONE_COURSE
@@ -17,12 +18,12 @@ class RedisCourseCacheService(CourseCacheService):
 
     """Redis implementation class for cache of course as service."""
 
-    def __init__(self, session: Redis, prefix: Literal['admin', 'talent']) -> None:
+    def __init__(self, session: Redis, prefix: Literal["admin", "talent", "test"]) -> None:
         self.session = session
         self.prefix = prefix
 
-    def __get_course_key(self, course_id: str) -> str:
-        return self.prefix + "-course-" + course_id
+    def __get_course_key(self, course_id: UUID) -> str:
+        return self.prefix + "-course-" + course_id.value
 
     def __get_courses_key(self) -> str:
         return self.prefix + "-courses"
@@ -30,7 +31,7 @@ class RedisCourseCacheService(CourseCacheService):
     @staticmethod
     def __from_domain_to_dict(course: CourseEntity) -> dict:
         return {
-            "id": course.id,
+            "id": course.id.value,
             "name": course.name.value,
             "image_url": course.image_url,
             "limits": course.limits,
@@ -53,7 +54,7 @@ class RedisCourseCacheService(CourseCacheService):
     @staticmethod
     def __from_dict_to_domain(course_: dict) -> CourseEntity:
         return CourseEntity(
-            id=str(course_["id"]),
+            id=UUID(course_["id"]),
             name=CourseName(course_["name"]),
             image_url=course_["image_url"],
             limits=course_["limits"],
@@ -73,7 +74,7 @@ class RedisCourseCacheService(CourseCacheService):
             last_runs=[CourseRun(run) for run in course_["last_runs"]],
         )
 
-    async def get_one(self, course_id: str) -> CourseEntity | None:
+    async def get_one(self, course_id: UUID) -> CourseEntity | None:
         try:
             course_data_string = await self.session.get(self.__get_course_key(course_id))
             course_dict = json.loads(course_data_string)
@@ -81,7 +82,7 @@ class RedisCourseCacheService(CourseCacheService):
         except (TypeError, JSONDecodeError):  # no such key in Redis
             return None
 
-    async def delete_one(self, course_id: str) -> None:
+    async def delete_one(self, course_id: UUID) -> None:
         await self.session.delete(self.__get_course_key(course_id))
 
     async def set_one(self, course: CourseEntity) -> None:

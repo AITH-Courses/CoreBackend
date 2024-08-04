@@ -3,6 +3,7 @@ from __future__ import annotations
 import uuid
 from typing import TYPE_CHECKING
 
+from src.domain.base_value_objects import UUID
 from src.domain.feedback.entities import FeedbackEntity
 from src.domain.feedback.exceptions import FeedbackBelongsToAnotherUserError, FeedbackNotFoundError
 from src.domain.feedback.value_objects import FeedbackText, Rating
@@ -19,7 +20,9 @@ class FeedbackCommandService:
         self.uow = uow
 
     async def create_feedback(self, course_id: str, author_id: str, text_: str, rating_: int) -> str:
-        feedback_id = str(uuid.uuid4())
+        feedback_id = UUID(str(uuid.uuid4()))
+        course_id = UUID(course_id)
+        author_id = UUID(author_id)
         text = FeedbackText(text_)
         rating = Rating(rating_)
         feedback = FeedbackEntity(feedback_id, course_id, author_id, text, rating)
@@ -29,12 +32,12 @@ class FeedbackCommandService:
         except Exception:
             await self.uow.rollback()
             raise
-        return feedback_id
+        return feedback_id.value
 
     async def vote(self, feedback_id: str, user_id: str, vote_type: str) -> None:
         try:
-            feedback = await self.uow.feedback_repo.get_one_by_id(feedback_id)
-            feedback.vote(user_id, vote_type)
+            feedback = await self.uow.feedback_repo.get_one_by_id(UUID(feedback_id))
+            feedback.vote(UUID(user_id), vote_type)
             await self.uow.feedback_repo.update_votes(feedback)
             await self.uow.commit()
         except FeedbackNotFoundError:
@@ -43,8 +46,8 @@ class FeedbackCommandService:
 
     async def unvote(self, feedback_id: str, user_id: str) -> None:
         try:
-            feedback = await self.uow.feedback_repo.get_one_by_id(feedback_id)
-            feedback.unvote(user_id)
+            feedback = await self.uow.feedback_repo.get_one_by_id(UUID(feedback_id))
+            feedback.unvote(UUID(user_id))
             await self.uow.feedback_repo.update_votes(feedback)
             await self.uow.commit()
         except FeedbackNotFoundError:
@@ -52,6 +55,8 @@ class FeedbackCommandService:
             raise
 
     async def delete_feedback(self, feedback_id: str, user_id: str) -> None:
+        feedback_id = UUID(feedback_id)
+        user_id = UUID(user_id)
         try:
             feedback = await self.uow.feedback_repo.get_one_by_id(feedback_id)
             if feedback.author_id != user_id:
