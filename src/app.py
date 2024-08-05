@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
@@ -9,6 +9,7 @@ from src.api.courses.router import router as course_router
 from src.api.feedback.router import router as feedback_router
 from src.api.health_check import router as health_check_router
 from src.config import app_config
+from src.domain.base_exceptions import IncorrectUUIDError
 from src.exceptions import ApplicationError
 from src.infrastructure.fastapi.docs import add_custom_docs_endpoints
 
@@ -21,7 +22,7 @@ def add_exception_handler(application: FastAPI) -> None:
     """
 
     @application.exception_handler(ApplicationError)
-    async def unicorn_exception_handler(_: Request, exc: ApplicationError) -> JSONResponse:
+    async def handle_application_error(_: Request, exc: ApplicationError) -> JSONResponse:
         """Handle application error.
 
         :param _:
@@ -30,6 +31,19 @@ def add_exception_handler(application: FastAPI) -> None:
         """
         return JSONResponse(
             status_code=exc.status,
+            content=ErrorResponse(message=exc.message).model_dump(),
+        )
+
+    @application.exception_handler(IncorrectUUIDError)
+    async def handler_incorrect_uuid_error(_: Request, exc: IncorrectUUIDError) -> JSONResponse:
+        """Handle incorrect uuid error.
+
+        :param _:
+        :param exc:
+        :return: JSONResponse
+        """
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
             content=ErrorResponse(message=exc.message).model_dump(),
         )
 
