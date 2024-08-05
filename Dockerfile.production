@@ -1,0 +1,13 @@
+FROM python:3.11-alpine AS builder
+WORKDIR /app
+COPY poetry.lock pyproject.toml alembic.ini ./
+RUN python -m pip install --no-cache-dir poetry \
+    && poetry config virtualenvs.in-project true \
+    && poetry install --without dev,test --no-interaction --no-ansi
+
+FROM python:3.11-alpine as production
+COPY --from=builder /app /app
+COPY src /app/src
+COPY alembic /app/alembic
+ENV PYTHONPATH=/app
+CMD ["/app/.venv/bin/python", "-m", "uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "5000"]
