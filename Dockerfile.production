@@ -10,4 +10,6 @@ COPY --from=builder /app /app
 COPY src /app/src
 COPY alembic /app/alembic
 ENV PYTHONPATH=/app
-CMD ["/app/.venv/bin/python", "-m", "uvicorn", "src.app:app", "--host", "0.0.0.0", "--port", "5000"]
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x ./app/entrypoint.sh
+ENTRYPOINT ["sh", "./app/entrypoint.sh"]
