@@ -1,0 +1,15 @@
+FROM python:3.11-alpine AS builder
+WORKDIR /app
+COPY poetry.lock pyproject.toml alembic.ini ./
+RUN python -m pip install --no-cache-dir poetry \
+    && poetry config virtualenvs.in-project true \
+    && poetry install --without dev,test --no-interaction --no-ansi
+
+FROM python:3.11-alpine as production
+COPY --from=builder /app /app
+COPY src /app/src
+COPY alembic /app/alembic
+ENV PYTHONPATH=/app
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x ./app/entrypoint.sh
+ENTRYPOINT ["sh", "./app/entrypoint.sh"]
