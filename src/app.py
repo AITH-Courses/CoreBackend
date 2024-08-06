@@ -54,11 +54,11 @@ def add_routers(application: FastAPI) -> None:
     :param application:
     :return: nothing
     """
-    application.include_router(router=health_check_router)
-    application.include_router(router=auth_router)
-    application.include_router(router=course_router)
-    application.include_router(router=feedback_router)
-    application.include_router(router=admin_course_router)
+    application.include_router(router=health_check_router, prefix="/api/v1")
+    application.include_router(router=auth_router, prefix="/api/v1")
+    application.include_router(router=course_router, prefix="/api/v1")
+    application.include_router(router=feedback_router, prefix="/api/v1")
+    application.include_router(router=admin_course_router, prefix="/api/v1")
 
 
 def add_cors(application: FastAPI) -> None:
