@@ -8,6 +8,13 @@ if TYPE_CHECKING:
     from src.domain.courses.entities import CourseEntity
 
 
+class ResourceDTO(BaseModel):
+
+    """Schema of resource for course."""
+
+    title: str = Field("Полезная книга")
+    link: str = Field("Ссылка на книгу")
+
 
 class CourseFullDTO(BaseModel):
 
@@ -23,7 +30,7 @@ class CourseFullDTO(BaseModel):
     description: str | None = Field("Information about NoSQL")
     topics: str | None = Field("1. History of NoSQL, 2. MongoDB, 3. Cassandra")
     assessment: str | None = Field("The capstone project")
-    resources: str | None = Field("1. Book `MongoDB in action`")
+    resources: list[ResourceDTO] = Field([ResourceDTO(title="Полезная книга", link="Ссылка на книгу")])
     extra: str | None = Field("")
 
     author: str | None = Field("Иванов И. И.")
@@ -47,7 +54,7 @@ class CourseFullDTO(BaseModel):
             description=course.description,
             topics=course.topics,
             assessment=course.assessment,
-            resources=course.resources,
+            resources=[ResourceDTO(title=res.title, link=res.link) for res in course.resources],
             extra=course.extra,
 
             author=course.author.value if course.author else None,

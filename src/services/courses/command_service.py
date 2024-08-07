@@ -8,7 +8,17 @@ from sqlalchemy.exc import IntegrityError
 from src.domain.base_value_objects import UUID
 from src.domain.courses.entities import CourseEntity
 from src.domain.courses.exceptions import CourseAlreadyExistsError, CourseNotFoundError
-from src.domain.courses.value_objects import Author, CourseName, CourseRun, Format, Implementer, Period, Role, Terms
+from src.domain.courses.value_objects import (
+    Author,
+    CourseName,
+    CourseRun,
+    Format,
+    Implementer,
+    Period,
+    Resource,
+    Role,
+    Terms,
+)
 
 if TYPE_CHECKING:
     from src.services.courses.unit_of_work import CoursesUnitOfWork
@@ -39,7 +49,7 @@ class CourseCommandService:
     async def update_course(
             self, course_id: str, name_: str, image_url: str | None, limits_: int | None,
             prerequisites_: str | None, description_: str | None, topics_: str | None,
-            assessment_: str | None, resources_: str | None, extra_: str | None,
+            assessment_: str | None, resources_: list[dict[str, str]], extra_: str | None,
             author_: str | None, implementer_: str | None, format_: str | None,
             terms_: str | None, roles: list[str], periods: list[str], runs: list[str],
     ) -> None:
@@ -52,7 +62,7 @@ class CourseCommandService:
             description=description_,
             topics=topics_,
             assessment=assessment_,
-            resources=resources_,
+            resources=[Resource(title=res["title"], link=res["link"]) for res in resources_],
             extra=extra_,
             author=Author(author_) if author_ else None,
             implementer=Implementer(implementer_) if implementer_ else None,

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from typing import TYPE_CHECKING
 
 from sqlalchemy import select
@@ -37,7 +38,7 @@ class SQLAlchemyCourseRepository(ICourseRepository):
         course_.description = course.description
         course_.topics = course.topics
         course_.assessment = course.assessment
-        course_.resources = course.resources
+        course_.resources = json.dumps([{"link": res.link, "title": res.title} for res in course.resources])
         course_.extra = course.extra
         course_.author = course.author.value if course.author else None
         course_.implementer = course.implementer.value if course.implementer else None

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import datetime
+import json
 import uuid
 
 from sqlalchemy import ForeignKey, Text, text
@@ -8,7 +9,17 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.domain.base_value_objects import UUID
 from src.domain.courses.entities import CourseEntity
-from src.domain.courses.value_objects import Author, CourseName, CourseRun, Format, Implementer, Period, Role, Terms
+from src.domain.courses.value_objects import (
+    Author,
+    CourseName,
+    CourseRun,
+    Format,
+    Implementer,
+    Period,
+    Resource,
+    Role,
+    Terms,
+)
 from src.infrastructure.sqlalchemy.session import Base
 
 
@@ -51,6 +62,7 @@ class Course(Base):
 
     @staticmethod
     def from_domain(course: CourseEntity) -> Course:
+        resources_json_string = json.dumps(course.resources)
         return Course(
             id=course.id.value,
             name=course.name.value,
@@ -60,7 +72,7 @@ class Course(Base):
             description=course.description,
             topics=course.topics,
             assessment=course.assessment,
-            resources=course.resources,
+            resources=resources_json_string,
             extra=course.extra,
             author=course.author.value if course.author else None,
             implementer=course.implementer.value if course.implementer else None,
@@ -73,6 +85,10 @@ class Course(Base):
 
     def to_domain(self) -> CourseEntity:
         course_ = self
+        try:
+            resources = json.loads(course_.resources)
+        except (json.decoder.JSONDecodeError, TypeError):
+            resources = []
         return CourseEntity(
             id=UUID(str(course_.id)),
             name=CourseName(course_.name),
@@ -83,7 +99,7 @@ class Course(Base):
             description=course_.description,
             topics=course_.topics,
             assessment=course_.assessment,
-            resources=course_.resources,
+            resources=[Resource(title=res["title"], link=res["link"]) for res in resources],
             extra=course_.extra,
             author=Author(str(course_.author)) if course_.author else None,
             implementer=Implementer(str(course_.implementer)) if course_.implementer else None,

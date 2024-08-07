@@ -6,7 +6,17 @@ from typing import TYPE_CHECKING, Literal
 
 from src.domain.base_value_objects import UUID
 from src.domain.courses.entities import CourseEntity
-from src.domain.courses.value_objects import Author, CourseName, CourseRun, Format, Implementer, Period, Role, Terms
+from src.domain.courses.value_objects import (
+    Author,
+    CourseName,
+    CourseRun,
+    Format,
+    Implementer,
+    Period,
+    Resource,
+    Role,
+    Terms,
+)
 from src.infrastructure.redis.courses.constants import TIME_TO_LIVE_ALL_COURSES, TIME_TO_LIVE_ONE_COURSE
 from src.services.courses.course_cache_service import CourseCacheService
 
@@ -40,7 +50,7 @@ class RedisCourseCacheService(CourseCacheService):
             "description": course.description,
             "topics": course.topics,
             "assessment": course.assessment,
-            "resources": course.resources,
+            "resources": [{"title": res.title, "link": res.link} for res in course.resources],
             "extra": course.extra,
             "author": course.author.value if course.author else None,
             "implementer": course.implementer.value if course.implementer else None,
@@ -63,7 +73,7 @@ class RedisCourseCacheService(CourseCacheService):
             description=course_["description"],
             topics=course_["topics"],
             assessment=course_["assessment"],
-            resources=course_["resources"],
+            resources=[Resource(title=res["title"], link=res["link"]) for res in course_["resources"]],
             extra=course_["extra"],
             author=Author(course_["author"]) if course_["author"] else None,
             implementer=Implementer(course_["implementer"]) if course_["implementer"] else None,

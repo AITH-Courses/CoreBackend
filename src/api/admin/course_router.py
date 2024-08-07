@@ -136,7 +136,7 @@ async def update_course(
             image_url=data.image_url, limits_=data.limits,
             prerequisites_=data.prerequisites,
             description_=data.description, topics_=data.topics,
-            assessment_=data.assessment, resources_=data.resources,
+            assessment_=data.assessment, resources_=[res.model_dump() for res in data.resources],
             extra_=data.extra, author_=data.author,
             implementer_=data.implementer, format_=data.format,
             terms_=data.terms, roles=data.roles,

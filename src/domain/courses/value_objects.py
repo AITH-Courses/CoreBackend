@@ -154,3 +154,12 @@ class CourseRun:
         except ValueError as ex:
             raise IncorrectCourseRunNameError from ex
         object.__setattr__(self, "value", value)
+
+
+@dataclass(init=True, eq=True, frozen=True)
+class Resource:
+
+    """Resource of course as a value object."""
+
+    title: str
+    link: str

@@ -7,7 +7,17 @@ from src.domain.courses.exceptions import CoursePublishError
 
 if TYPE_CHECKING:
     from src.domain.base_value_objects import UUID
-    from src.domain.courses.value_objects import Author, CourseName, CourseRun, Format, Implementer, Period, Role, Terms
+    from src.domain.courses.value_objects import (
+        Author,
+        CourseName,
+        CourseRun,
+        Format,
+        Implementer,
+        Period,
+        Resource,
+        Role,
+        Terms,
+    )
 
 
 @dataclass
@@ -25,7 +35,7 @@ class CourseEntity:
     description: str | None = field(default=None)
     topics: str | None = field(default=None)
     assessment: str | None = field(default=None)
-    resources: str | None = field(default=None)
+    resources: list[Resource] = field(default_factory=list)
     extra: str | None = field(default=None)
 
     author: Author | None = field(default=None)

@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from pydantic import BaseModel, Field
 
+from src.api.courses.schemas import ResourceDTO
+
 
 class CreateCourseRequest(BaseModel):
 
@@ -29,7 +31,7 @@ class UpdateCourseRequest(BaseModel):
     description: str | None = Field("Information about NoSQL")
     topics: str | None = Field("1. History of NoSQL, 2. MongoDB, 3. Cassandra")
     assessment: str | None = Field("The capstone project")
-    resources: str | None = Field("1. Book `MongoDB in action`")
+    resources: list[ResourceDTO] = Field([ResourceDTO(title="Полезная книга", link="Ссылка на книгу")])
     extra: str | None = Field("")
 
     author: str | None = Field("Иванов И. И.")
