@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import datetime
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
 from src.domain.timetable.exceptions import TimetableError
@@ -19,6 +19,7 @@ class DayRuleEntity:
     """Entity of timetable rule for day."""
 
     id: UUID
+    timetable_id: UUID
     start_time: datetime.time
     end_time: datetime.time
     date: datetime.date
@@ -38,6 +39,7 @@ class WeekRuleEntity:
     """Entity of timetable rule for week."""
 
     id: UUID
+    timetable_id: UUID
     start_time: datetime.time
     end_time: datetime.time
     start_period_date: datetime.date
@@ -71,7 +73,7 @@ class TimetableEntity:
 
     id: UUID
     course_run_id: UUID
-    rules: list[DayRuleEntity | WeekRuleEntity]
+    rules: list[DayRuleEntity | WeekRuleEntity] = field(default_factory=list)
 
     @property
     def lessons(self) -> list[LessonTimeDuration]:

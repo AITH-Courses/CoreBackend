@@ -1,8 +1,6 @@
 import datetime
 import uuid
 
-import pytest
-
 from src.domain.base_value_objects import UUID
 from src.domain.timetable.entities import DayRuleEntity, WeekRuleEntity, TimetableEntity
 from src.domain.timetable.value_objects import Weekday
@@ -14,6 +12,7 @@ def test_day_rule_lessons():
     h2, m2 = 18, 30
     rule = DayRuleEntity(
         id=UUID(str(uuid.uuid4())),
+        timetable_id=UUID(str(uuid.uuid4())),
         start_time=datetime.time(h1, m1),
         end_time=datetime.time(h2, m2),
         date=datetime.date(year, month, day),
@@ -30,6 +29,7 @@ def test_week_rule_lessons_no_weekdays():
     h2, m2, s = 18, 30, 0
     rule = WeekRuleEntity(
         id=UUID(str(uuid.uuid4())),
+        timetable_id=UUID(str(uuid.uuid4())),
         start_time=datetime.time(h1, m1, s),
         end_time=datetime.time(h2, m2, s),
         start_period_date=datetime.date(year, month, d1),
@@ -46,6 +46,7 @@ def test_week_rule_lessons_one_weekday():
     h2, m2, s = 18, 30, 0
     rule = WeekRuleEntity(
         id=UUID(str(uuid.uuid4())),
+        timetable_id=UUID(str(uuid.uuid4())),
         start_time=datetime.time(h1, m1, s),
         end_time=datetime.time(h2, m2, s),
         start_period_date=datetime.date(year, month, d1),
@@ -66,6 +67,7 @@ def test_week_rule_lessons_two_weekdays():
     h2, m2, s = 18, 30, 0
     rule = WeekRuleEntity(
         id=UUID(str(uuid.uuid4())),
+        timetable_id=UUID(str(uuid.uuid4())),
         start_time=datetime.time(h1, m1, s),
         end_time=datetime.time(h2, m2, s),
         start_period_date=datetime.date(year, month, d1),
@@ -84,6 +86,7 @@ def test_timetable_no_warnings():
     h2, m2 = 18, 30
     rule = DayRuleEntity(
         id=UUID(str(uuid.uuid4())),
+        timetable_id=UUID(str(uuid.uuid4())),
         start_time=datetime.time(h1, m1),
         end_time=datetime.time(h2, m2),
         date=datetime.date(year, month, day),
@@ -104,6 +107,7 @@ def test_timetable_with_warnings():
     h2, m2 = 18, 30
     rule = DayRuleEntity(
         id=UUID(str(uuid.uuid4())),
+        timetable_id=UUID(str(uuid.uuid4())),
         start_time=datetime.time(h1, m1),
         end_time=datetime.time(h2, m2),
         date=datetime.date(year, month, day),
