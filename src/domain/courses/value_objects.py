@@ -155,6 +155,14 @@ class CourseRun:
             raise IncorrectCourseRunNameError from ex
         object.__setattr__(self, "value", value)
 
+    @property
+    def year(self):
+        return int(self.value.split(" ")[1])
+
+    @property
+    def season(self):
+        return self.value.split(" ")[0]
+
 
 @dataclass(init=True, eq=True, frozen=True)
 class Resource:
