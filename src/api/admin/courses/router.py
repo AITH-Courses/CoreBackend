@@ -26,7 +26,7 @@ if TYPE_CHECKING:
     from src.services.courses.query_service_for_talent import TalentCourseQueryService
 
 
-router = APIRouter(prefix="/admin", tags=["admin"])
+router = APIRouter(prefix="/admin/courses", tags=["admin"])
 
 
 @router.post(
@@ -88,7 +88,7 @@ async def create_course(
 
 
 @router.put(
-    "/courses/{course_id}",
+    "/{course_id}",
     status_code=status.HTTP_200_OK,
     description="Update course",
     summary="Update course",
@@ -168,7 +168,7 @@ async def update_course(
 
 
 @router.delete(
-    "/courses/{course_id}",
+    "/{course_id}",
     status_code=status.HTTP_200_OK,
     description="Delete course",
     summary="Delete course",
@@ -216,7 +216,7 @@ async def delete_course(
 
 
 @router.get(
-    "/courses/{course_id}",
+    "/{course_id}",
     status_code=status.HTTP_200_OK,
     description="Get course",
     summary="Get course",
@@ -285,7 +285,7 @@ async def get_courses(
 
 
 @router.post(
-    "/courses/{course_id}/published",
+    "/{course_id}/published",
     status_code=status.HTTP_200_OK,
     description="Publish course",
     summary="Publish course",
@@ -342,7 +342,7 @@ async def publish_course(
 
 
 @router.delete(
-    "/courses/{course_id}/published",
+    "/{course_id}/published",
     status_code=status.HTTP_200_OK,
     description="Hide course",
     summary="Hide course",
