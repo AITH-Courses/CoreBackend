@@ -7,7 +7,7 @@ from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import joinedload
 
 from src.domain.timetable.entities import TimetableEntity, DayRuleEntity, WeekRuleEntity
-from src.domain.timetable.exceptions import TimetableNotFoundError, RuleNotFoundError
+from src.domain.timetable.exceptions import TimetableNotFoundError, RuleNotFoundError, IncorrectRuleTypeError
 from src.domain.timetable.timetable_repository import ITimetableRepository
 from src.infrastructure.sqlalchemy.timetable.models import Timetable, TimetableRule
 
@@ -48,14 +48,16 @@ class SQLAlchemyTimetableRepository(ITimetableRepository):
         rule_ = await self.__get_by_rule_id(rule.id)
         rule_.start_time = rule.start_time
         rule_.end_time = rule.end_time
-        if isinstance(rule, DayRuleEntity):
+        if isinstance(rule, DayRuleEntity) and rule_.rule_type == "day":
             rule_.start_period_date = rule.date
             rule_.end_period_date = rule.date
             rule_.weekdays = ""
-        else:
+        elif isinstance(rule, WeekRuleEntity) and rule_.rule_type == "week":
             rule_.start_period_date = rule.start_period_date
             rule_.end_period_date = rule.end_period_date
             rule_.weekdays = ",".join([weekday.value for weekday in rule.weekdays])
+        else:
+            raise IncorrectRuleTypeError
 
     async def delete_rule(self, rule_id: UUID) -> None:
         rule_ = await self.__get_by_rule_id(rule_id)

@@ -77,7 +77,7 @@ class TimetableRule(Base):
             end_time=self.end_time,
             start_period_date=self.start_period_date,
             end_period_date=self.end_period_date,
-            weekdays=[Weekday(weekday) for weekday in self.weekdays.split(",")],
+            weekdays=[Weekday(weekday) for weekday in self.weekdays.split(",") if weekday != ""],
         )
 
 

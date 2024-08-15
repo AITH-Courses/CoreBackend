@@ -5,7 +5,7 @@ from src.infrastructure.sqlalchemy.timetable.repository import SQLAlchemyTimetab
 from src.services.timetable.unit_of_work import TimetableUnitOfWork
 
 
-class SQLAlchemyCourseRunUnitOfWork(SQLAlchemyUnitOfWork, TimetableUnitOfWork):
+class SQLAlchemyTimetableUnitOfWork(SQLAlchemyUnitOfWork, TimetableUnitOfWork):
 
     """SQLA implementation for unit of work."""
 
