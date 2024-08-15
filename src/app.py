@@ -4,6 +4,8 @@ from fastapi.responses import JSONResponse
 
 from src.api.admin.courses.router import router as admin_course_router
 from src.api.admin.course_run.router import router as admin_course_run_router
+from src.api.admin.timetable.router import router as admin_timetable_router
+from src.api.timetable.router import router as course_timetable_router
 from src.api.auth.router import router as auth_router
 from src.api.base_schemas import ErrorResponse
 from src.api.courses.router import router as course_router
@@ -58,9 +60,11 @@ def add_routers(application: FastAPI) -> None:
     application.include_router(router=health_check_router, prefix="/api/v1")
     application.include_router(router=auth_router, prefix="/api/v1")
     application.include_router(router=course_router, prefix="/api/v1")
+    application.include_router(router=course_timetable_router, prefix="/api/v1")
     application.include_router(router=feedback_router, prefix="/api/v1")
     application.include_router(router=admin_course_router, prefix="/api/v1")
     application.include_router(router=admin_course_run_router, prefix="/api/v1")
+    application.include_router(router=admin_timetable_router, prefix="/api/v1")
 
 
 def add_cors(application: FastAPI) -> None:
