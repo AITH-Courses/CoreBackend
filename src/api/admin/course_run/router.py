@@ -1,7 +1,7 @@
 from fastapi import status, APIRouter, Depends, Body
 from fastapi.responses import JSONResponse
 
-from src.api.admin.course_run.dependencies import get_course_run_command_service
+from src.api.admin.course_run.dependencies import get_admin_course_run_command_service
 from src.api.admin.course_run.schemas import CourseRunDTO, CreateCourseRunResponse, CreateCourseRunRequest
 from src.api.admin.courses.dependencies import get_admin
 from src.api.auth.schemas import UserDTO
@@ -29,7 +29,7 @@ router = APIRouter(prefix="/admin/courses/{course_id}/runs", tags=["admin"])
 async def get_all_course_runs(
     course_id: str,
     _: UserDTO = Depends(get_admin),
-    command_service: CourseRunCommandService = Depends(get_course_run_command_service),
+    command_service: CourseRunCommandService = Depends(get_admin_course_run_command_service),
 ) -> JSONResponse:
     """Get course runs.
 
@@ -63,7 +63,7 @@ async def get_one_course_run(
     course_id: str,
     course_run_id: str,
     _: UserDTO = Depends(get_admin),
-    command_service: CourseRunCommandService = Depends(get_course_run_command_service),
+    command_service: CourseRunCommandService = Depends(get_admin_course_run_command_service),
 ) -> JSONResponse:
     """Get course run.
 
@@ -107,7 +107,7 @@ async def create_course_run(
     course_id: str,
     data: CreateCourseRunRequest = Body(),
     _: UserDTO = Depends(get_admin),
-    command_service: CourseRunCommandService = Depends(get_course_run_command_service),
+    command_service: CourseRunCommandService = Depends(get_admin_course_run_command_service),
 ) -> JSONResponse:
     """Create course run.
 
@@ -116,7 +116,7 @@ async def create_course_run(
     try:
         course_run_id = await command_service.create_course_run(course_id, data.season, data.year)
         return JSONResponse(
-            status_code=status.HTTP_200_OK,
+            status_code=status.HTTP_201_CREATED,
             content=CreateCourseRunResponse(course_run_id=course_run_id).model_dump(),
         )
     except IncorrectCourseRunNameError as ex:
@@ -152,7 +152,7 @@ async def delete_course_run(
     course_id: str,
     course_run_id: str,
     _: UserDTO = Depends(get_admin),
-    command_service: CourseRunCommandService = Depends(get_course_run_command_service),
+    command_service: CourseRunCommandService = Depends(get_admin_course_run_command_service),
 ) -> JSONResponse:
     """Delete course run.
 
@@ -162,7 +162,7 @@ async def delete_course_run(
         await command_service.delete_course_run(course_run_id)
         return JSONResponse(
             status_code=status.HTTP_200_OK,
-            content=SuccessResponse(mesage="Запуск курса успешно удален").model_dump(),
+            content=SuccessResponse(message="Запуск курса успешно удален").model_dump(),
         )
     except CourseRunNotFoundError as ex:
         return JSONResponse(

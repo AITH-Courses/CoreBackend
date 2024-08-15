@@ -70,7 +70,10 @@ class CourseRunCommandService:
         for course_run in course_runs:
             if course_run.is_actual_by_date(current_date):
                 try:
-                    return await self.uow.timetable_repo.get_by_id(course_run.id)
+                    timetable = await self.uow.timetable_repo.get_by_id(course_run.id)
+                    if not timetable.lessons:
+                        raise NoActualTimetableError("Для актуального запуска еще не создано расписание")
+                    return timetable
                 except TimetableNotFoundError as ex:
                     raise NoActualTimetableError("Для актуального запуска еще не создано расписание") from ex
         raise NoActualTimetableError("Для курса еще не создан актуальный запуск")
