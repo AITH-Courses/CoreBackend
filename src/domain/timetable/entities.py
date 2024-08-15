@@ -91,7 +91,7 @@ class TimetableEntity:
             for j in range(i+1, len(current_lessons)):
                 if current_lessons[i].start_time.date() != current_lessons[j].start_time.date():
                     continue
-                if current_lessons[i].start_time < current_lessons[j].end_time and current_lessons[j].start_time < current_lessons[i].end_time:
+                if current_lessons[i].start_time <= current_lessons[j].end_time and current_lessons[j].start_time <= current_lessons[i].end_time:
                     warning = TimetableWarning(current_lessons[i].start_time.date(), "Пересечение занятий в этот день")
                     current_warnings.add(warning)
         return current_warnings

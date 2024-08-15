@@ -40,3 +40,24 @@ class TimetableForOnlyOneCourseRunError(DomainError):
     @property
     def message(self) -> str:
         return "Для одного запуска может быть сформировано только одно расписание"
+
+
+class IncorrectRuleTypeError(DomainError):
+
+    """Rule type is not valid."""
+
+    @property
+    def message(self) -> str:
+        return "Некорректный или несоответствующий тип правила"
+
+
+@dataclass
+class NoActualTimetableError(DomainError):
+
+    """Timetable is not available for course."""
+
+    error_message: str
+
+    @property
+    def message(self) -> str:
+        return self.error_message
