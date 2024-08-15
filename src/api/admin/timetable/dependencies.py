@@ -1,8 +1,8 @@
 from fastapi import Depends
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.infrastructure.sqlalchemy.timetable.unit_of_work import SQLAlchemyTimetableUnitOfWork
 from src.infrastructure.sqlalchemy.session import get_async_session
+from src.infrastructure.sqlalchemy.timetable.unit_of_work import SQLAlchemyTimetableUnitOfWork
 from src.services.timetable.command_service import TimetableCommandService
 
 

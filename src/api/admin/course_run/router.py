@@ -1,12 +1,12 @@
-from fastapi import status, APIRouter, Depends, Body
+from fastapi import APIRouter, Body, Depends, status
 from fastapi.responses import JSONResponse
 
 from src.api.admin.course_run.dependencies import get_admin_course_run_command_service
-from src.api.admin.course_run.schemas import CourseRunDTO, CreateCourseRunResponse, CreateCourseRunRequest
+from src.api.admin.course_run.schemas import CourseRunDTO, CreateCourseRunRequest, CreateCourseRunResponse
 from src.api.admin.courses.dependencies import get_admin
 from src.api.auth.schemas import UserDTO
 from src.api.base_schemas import ErrorResponse, SuccessResponse
-from src.domain.course_run.exceptions import CourseRunNotFoundError, CourseRunAlreadyExistsError
+from src.domain.course_run.exceptions import CourseRunAlreadyExistsError, CourseRunNotFoundError
 from src.domain.courses.exceptions import IncorrectCourseRunNameError
 from src.services.course_run.command_service import CourseRunCommandService
 

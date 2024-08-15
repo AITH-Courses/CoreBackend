@@ -3,11 +3,11 @@ from __future__ import annotations
 import datetime
 import uuid
 
-from sqlalchemy import text, ForeignKey
+from sqlalchemy import ForeignKey, text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from src.domain.base_value_objects import UUID
-from src.domain.timetable.entities import DayRuleEntity, WeekRuleEntity, TimetableEntity
+from src.domain.timetable.entities import DayRuleEntity, TimetableEntity, WeekRuleEntity
 from src.domain.timetable.value_objects import Weekday
 from src.infrastructure.sqlalchemy.session import Base
 
@@ -48,7 +48,7 @@ class TimetableRule(Base):
                 end_time=rule.end_time,
                 start_period_date=rule.date,
                 end_period_date=rule.date,
-                weekdays=""
+                weekdays="",
             )
         return TimetableRule(
             id=rule.id.value,
@@ -58,7 +58,7 @@ class TimetableRule(Base):
             end_time=rule.end_time,
             start_period_date=rule.start_period_date,
             end_period_date=rule.end_period_date,
-            weekdays=",".join([weekday.value for weekday in rule.weekdays])
+            weekdays=",".join([weekday.value for weekday in rule.weekdays]),
         )
 
     def to_domain(self) -> DayRuleEntity | WeekRuleEntity:
@@ -68,7 +68,7 @@ class TimetableRule(Base):
                 timetable_id=UUID(str(self.timetable_id)),
                 start_time=self.start_time,
                 end_time=self.end_time,
-                date=self.start_period_date
+                date=self.start_period_date,
             )
         return WeekRuleEntity(
             id=UUID(str(self.id)),
@@ -106,12 +106,12 @@ class Timetable(Base):
         return Timetable(
             id=timetable.id.value,
             course_run_id=timetable.course_run_id.value,
-            rules=[TimetableRule.from_domain(rule) for rule in timetable.rules]
+            rules=[TimetableRule.from_domain(rule) for rule in timetable.rules],
         )
 
     def to_domain(self) -> TimetableEntity:
         return TimetableEntity(
             id=UUID(str(self.id)),
             course_run_id=UUID(str(self.course_run_id)),
-            rules=[rule.to_domain() for rule in self.rules]
+            rules=[rule.to_domain() for rule in self.rules],
         )

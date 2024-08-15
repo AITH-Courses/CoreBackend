@@ -2,15 +2,15 @@ from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from src.api.admin.courses.router import router as admin_course_router
 from src.api.admin.course_run.router import router as admin_course_run_router
+from src.api.admin.courses.router import router as admin_course_router
 from src.api.admin.timetable.router import router as admin_timetable_router
-from src.api.timetable.router import router as course_timetable_router
 from src.api.auth.router import router as auth_router
 from src.api.base_schemas import ErrorResponse
 from src.api.courses.router import router as course_router
 from src.api.feedback.router import router as feedback_router
 from src.api.health_check import router as health_check_router
+from src.api.timetable.router import router as course_timetable_router
 from src.config import app_config
 from src.domain.base_exceptions import IncorrectUUIDError
 from src.exceptions import ApplicationError

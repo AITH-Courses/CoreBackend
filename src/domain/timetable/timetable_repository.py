@@ -3,10 +3,9 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-
 if TYPE_CHECKING:
     from src.domain.base_value_objects import UUID
-    from src.domain.timetable.entities import TimetableEntity, DayRuleEntity, WeekRuleEntity
+    from src.domain.timetable.entities import DayRuleEntity, TimetableEntity, WeekRuleEntity
 
 
 class ITimetableRepository(ABC):

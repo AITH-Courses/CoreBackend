@@ -4,10 +4,9 @@ import datetime
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
-from src.domain.timetable.exceptions import TimetableError
 from src.domain.timetable.constants import WEEKDAYS
-from src.domain.timetable.value_objects import Weekday, TimetableWarning
-from src.domain.timetable.value_objects import LessonTimeDuration
+from src.domain.timetable.exceptions import TimetableError
+from src.domain.timetable.value_objects import LessonTimeDuration, TimetableWarning, Weekday
 
 if TYPE_CHECKING:
     from src.domain.base_value_objects import UUID
@@ -57,7 +56,8 @@ class WeekRuleEntity:
                 continue
             year, month, day = current_date.year, current_date.month, current_date.day
             lesson = LessonTimeDuration(
-                datetime.datetime(year, month, day, self.start_time.hour, self.start_time.minute, self.start_time.second),
+                datetime.datetime(year, month, day, self.start_time.hour, self.start_time.minute,
+                                  self.start_time.second),
                 datetime.datetime(year, month, day, self.end_time.hour, self.end_time.minute, self.end_time.second),
             )
             current_lessons.append(lesson)
@@ -88,10 +88,11 @@ class TimetableEntity:
         current_lessons = self.lessons
         current_warnings = set()
         for i in range(len(current_lessons)):
-            for j in range(i+1, len(current_lessons)):
+            for j in range(i + 1, len(current_lessons)):
                 if current_lessons[i].start_time.date() != current_lessons[j].start_time.date():
                     continue
-                if current_lessons[i].start_time <= current_lessons[j].end_time and current_lessons[j].start_time <= current_lessons[i].end_time:
+                if current_lessons[i].start_time <= current_lessons[j].end_time and current_lessons[j].start_time <= \
+                        current_lessons[i].end_time:
                     warning = TimetableWarning(current_lessons[i].start_time.date(), "Пересечение занятий в этот день")
                     current_warnings.add(warning)
         return current_warnings
@@ -106,5 +107,6 @@ class TimetableEntity:
             for other_lesson in other_lessons:
                 if current_lesson.start_time.date() != other_lesson.start_time.date():
                     continue
-                elif current_lesson.start_time < other_lesson.end_time and other_lesson.start_time < current_lesson.end_time:
+                if (current_lesson.start_time < other_lesson.end_time
+                        and other_lesson.start_time < current_lesson.end_time):
                     raise lesson_intersection_error

@@ -6,13 +6,14 @@ from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.orm import joinedload
 
-from src.domain.timetable.entities import TimetableEntity, DayRuleEntity, WeekRuleEntity
-from src.domain.timetable.exceptions import TimetableNotFoundError, RuleNotFoundError, IncorrectRuleTypeError
+from src.domain.timetable.entities import DayRuleEntity, TimetableEntity, WeekRuleEntity
+from src.domain.timetable.exceptions import IncorrectRuleTypeError, RuleNotFoundError, TimetableNotFoundError
 from src.domain.timetable.timetable_repository import ITimetableRepository
 from src.infrastructure.sqlalchemy.timetable.models import Timetable, TimetableRule
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
+
     from src.domain.base_value_objects import UUID
 
 

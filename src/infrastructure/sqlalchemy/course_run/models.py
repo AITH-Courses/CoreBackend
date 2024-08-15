@@ -3,7 +3,7 @@ from __future__ import annotations
 import datetime
 import uuid
 
-from sqlalchemy import text, UniqueConstraint
+from sqlalchemy import UniqueConstraint, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from src.domain.base_value_objects import UUID
@@ -31,7 +31,7 @@ class CourseRun(Base):
         onupdate=datetime.datetime.utcnow,
     )
 
-    __table_args__ = (UniqueConstraint('course_id', 'name', name='uix_name_email'),)
+    __table_args__ = (UniqueConstraint("course_id", "name", name="uix_name_email"),)
 
     @staticmethod
     def from_domain(course_run: CourseRunEntity) -> CourseRun:

@@ -1,11 +1,17 @@
+from __future__ import annotations
+
 import datetime
 from typing import Literal
 
 from pydantic import BaseModel
-from src.domain.timetable.entities import TimetableEntity, WeekRuleEntity, DayRuleEntity
+
+from src.domain.timetable.entities import DayRuleEntity, TimetableEntity, WeekRuleEntity
 
 
 class DayRuleDTO(BaseModel):
+
+    """Schema for day rule."""
+
     id: str
     timetable_id: str
     type: str
@@ -14,7 +20,7 @@ class DayRuleDTO(BaseModel):
     date: datetime.date
 
     @staticmethod
-    def from_domain(rule: DayRuleEntity) -> "DayRuleDTO":
+    def from_domain(rule: DayRuleEntity) -> DayRuleDTO:
         return DayRuleDTO(
             id=rule.id.value,
             timetable_id=rule.timetable_id.value,
@@ -26,12 +32,18 @@ class DayRuleDTO(BaseModel):
 
 
 class CreateOrUpdateRuleDayDTO(BaseModel):
+
+    """Schema for create or update day rule."""
+
     start_time: datetime.time
     end_time: datetime.time
     date: datetime.date
 
 
 class WeekRuleDTO(BaseModel):
+
+    """Schema for week rule."""
+
     id: str
     timetable_id: str
     type: str
@@ -42,7 +54,7 @@ class WeekRuleDTO(BaseModel):
     weekdays: list[str]
 
     @staticmethod
-    def from_domain(rule: WeekRuleEntity) -> "WeekRuleDTO":
+    def from_domain(rule: WeekRuleEntity) -> WeekRuleDTO:
         return WeekRuleDTO(
             id=rule.id.value,
             timetable_id=rule.timetable_id.value,
@@ -56,6 +68,9 @@ class WeekRuleDTO(BaseModel):
 
 
 class CreateOrUpdateWeekRuleDTO(BaseModel):
+
+    """Schema for create or update week rule."""
+
     start_time: datetime.time
     end_time: datetime.time
     start_period_date: datetime.date
@@ -64,15 +79,24 @@ class CreateOrUpdateWeekRuleDTO(BaseModel):
 
 
 class CreateRuleResponse(BaseModel):
+
+    """Schema of create rule response."""
+
     rule_id: str
 
 
 class CreateOrUpdateRuleRequest(BaseModel):
+
+    """Schema of create or update rule request."""
+
     type: Literal["day", "week"]
     rule: CreateOrUpdateRuleDayDTO | CreateOrUpdateWeekRuleDTO
 
 
 class LessonDTO(BaseModel):
+
+    """Schema of lesson."""
+
     start_time: datetime.time
     end_time: datetime.time
     date: datetime.date
@@ -80,12 +104,15 @@ class LessonDTO(BaseModel):
 
 
 class TimetableDTO(BaseModel):
+
+    """Schema of timetable."""
+
     id: str
     rules: list[DayRuleDTO | WeekRuleDTO]
     lessons: list[LessonDTO]
 
     @staticmethod
-    def from_domain(timetable: TimetableEntity) -> "TimetableDTO":
+    def from_domain(timetable: TimetableEntity) -> TimetableDTO:
         current_lessons = timetable.lessons
         warnings = timetable.warnings
         return TimetableDTO(
@@ -95,11 +122,11 @@ class TimetableDTO(BaseModel):
                     start_time=lesson.start_time.time(),
                     end_time=lesson.end_time.time(),
                     date=lesson.start_time.date(),
-                    warning_messages=[w.message for w in warnings if w.day == lesson.start_time.date()]
+                    warning_messages=[w.message for w in warnings if w.day == lesson.start_time.date()],
                 ) for lesson in current_lessons
             ],
             rules=[
                 (WeekRuleDTO.from_domain(rule) if isinstance(rule, WeekRuleEntity) else DayRuleDTO.from_domain(rule))
                 for rule in timetable.rules
-            ]
+            ],
         )

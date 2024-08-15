@@ -7,11 +7,11 @@ from typing import TYPE_CHECKING
 from sqlalchemy.exc import IntegrityError
 
 from src.domain.base_value_objects import UUID
+from src.domain.course_run.entities import CourseRunEntity
 from src.domain.course_run.exceptions import CourseRunAlreadyExistsError
 from src.domain.courses.value_objects import CourseRun
-from src.domain.course_run.entities import CourseRunEntity
 from src.domain.timetable.entities import TimetableEntity
-from src.domain.timetable.exceptions import TimetableNotFoundError, NoActualTimetableError
+from src.domain.timetable.exceptions import NoActualTimetableError, TimetableNotFoundError
 
 if TYPE_CHECKING:
     from src.services.course_run.unit_of_work import CourseRunUnitOfWork
@@ -69,12 +69,14 @@ class CourseRunCommandService:
         course_runs = await self.uow.course_run_repo.get_all_by_course_id(course_id)
         for course_run in course_runs:
             if course_run.is_actual_by_date(current_date):
+                error_message = "Для актуального запуска еще не создано расписание"
                 try:
                     timetable = await self.uow.timetable_repo.get_by_id(course_run.id)
                     if not timetable.lessons:
-                        raise NoActualTimetableError("Для актуального запуска еще не создано расписание")
-                    return timetable
+                        raise NoActualTimetableError(error_message=error_message)
                 except TimetableNotFoundError as ex:
-                    raise NoActualTimetableError("Для актуального запуска еще не создано расписание") from ex
-        raise NoActualTimetableError("Для курса еще не создан актуальный запуск")
+                    raise NoActualTimetableError(error_message=error_message) from ex
+                else:
+                    return timetable
+        raise NoActualTimetableError(error_message="Для курса еще не создан актуальный запуск")
 

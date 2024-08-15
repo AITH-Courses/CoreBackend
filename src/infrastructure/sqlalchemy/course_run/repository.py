@@ -11,6 +11,7 @@ from src.infrastructure.sqlalchemy.course_run.models import CourseRun
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
+
     from src.domain.base_value_objects import UUID
     from src.domain.course_run.entities import CourseRunEntity
 

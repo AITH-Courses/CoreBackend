@@ -7,6 +7,7 @@ from src.services.course_run.unit_of_work import CourseRunUnitOfWork
 
 
 class SQLAlchemyCourseRunUnitOfWork(SQLAlchemyUnitOfWork, CourseRunUnitOfWork):
+
     """SQLA implementation for unit of work."""
 
     def __init__(self, sqla_session: AsyncSession) -> None:

@@ -156,11 +156,11 @@ class CourseRun:
         object.__setattr__(self, "value", value)
 
     @property
-    def year(self):
+    def year(self) -> int:
         return int(self.value.split(" ")[1])
 
     @property
-    def season(self):
+    def season(self) -> str:
         return self.value.split(" ")[0]
 
 
