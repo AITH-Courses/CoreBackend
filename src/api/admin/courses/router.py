@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING
 from fastapi import APIRouter, Body, Depends, Path, status
 from fastapi.responses import JSONResponse
 
-from src.api.admin.dependencies import get_admin, get_admin_courses_query_service
-from src.api.admin.schemas import CreateCourseRequest, CreateCourseResponse, UpdateCourseRequest
+from src.api.admin.courses.dependencies import get_admin, get_admin_courses_query_service
+from src.api.admin.courses.schemas import CreateCourseRequest, CreateCourseResponse, UpdateCourseRequest
 from src.api.base_schemas import ErrorResponse, SuccessResponse
 from src.api.courses.dependencies import get_courses_command_service, get_talent_courses_query_service
 from src.api.courses.schemas import CourseFullDTO, CourseShortDTO
@@ -26,11 +26,11 @@ if TYPE_CHECKING:
     from src.services.courses.query_service_for_talent import TalentCourseQueryService
 
 
-router = APIRouter(prefix="/admin", tags=["admin"])
+router = APIRouter(prefix="/admin/courses", tags=["admin"])
 
 
 @router.post(
-    "/courses",
+    "",
     status_code=status.HTTP_201_CREATED,
     description="Create new course",
     summary="Create course",
@@ -88,7 +88,7 @@ async def create_course(
 
 
 @router.put(
-    "/courses/{course_id}",
+    "/{course_id}",
     status_code=status.HTTP_200_OK,
     description="Update course",
     summary="Update course",
@@ -168,7 +168,7 @@ async def update_course(
 
 
 @router.delete(
-    "/courses/{course_id}",
+    "/{course_id}",
     status_code=status.HTTP_200_OK,
     description="Delete course",
     summary="Delete course",
@@ -216,7 +216,7 @@ async def delete_course(
 
 
 @router.get(
-    "/courses/{course_id}",
+    "/{course_id}",
     status_code=status.HTTP_200_OK,
     description="Get course",
     summary="Get course",
@@ -258,7 +258,7 @@ async def get_course(
 
 
 @router.get(
-    "/courses",
+    "",
     status_code=status.HTTP_200_OK,
     description="Get all courses",
     summary="Get courses",
@@ -285,7 +285,7 @@ async def get_courses(
 
 
 @router.post(
-    "/courses/{course_id}/published",
+    "/{course_id}/published",
     status_code=status.HTTP_200_OK,
     description="Publish course",
     summary="Publish course",
@@ -342,7 +342,7 @@ async def publish_course(
 
 
 @router.delete(
-    "/courses/{course_id}/published",
+    "/{course_id}/published",
     status_code=status.HTTP_200_OK,
     description="Hide course",
     summary="Hide course",

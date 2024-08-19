@@ -10,6 +10,8 @@ from src.infrastructure.sqlalchemy.session import Base
 from src.infrastructure.sqlalchemy.users.models import User
 from src.infrastructure.sqlalchemy.courses.models import Course, RunForCourse, RoleForCourse, PeriodForCourse
 from src.infrastructure.sqlalchemy.feedback.models import Feedback, VoteForFeedback
+from src.infrastructure.sqlalchemy.course_run.models import CourseRun
+from src.infrastructure.sqlalchemy.timetable.models import TimetableRule
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
