@@ -4,12 +4,11 @@ from typing import TYPE_CHECKING
 
 from sqlalchemy import select
 from sqlalchemy.exc import NoResultFound
-from sqlalchemy.orm import joinedload
 
 from src.domain.timetable.entities import DayRuleEntity, TimetableEntity, WeekRuleEntity
-from src.domain.timetable.exceptions import IncorrectRuleTypeError, RuleNotFoundError, TimetableNotFoundError
+from src.domain.timetable.exceptions import IncorrectRuleTypeError, RuleNotFoundError
 from src.domain.timetable.timetable_repository import ITimetableRepository
-from src.infrastructure.sqlalchemy.timetable.models import Timetable, TimetableRule
+from src.infrastructure.sqlalchemy.timetable.models import TimetableRule
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
@@ -24,22 +23,18 @@ class SQLAlchemyTimetableRepository(ITimetableRepository):
     def __init__(self, session: AsyncSession) -> None:
         self.session = session
 
-    async def create(self, timetable: TimetableEntity) -> None:
-        timetable_ = Timetable.from_domain(timetable)
-        self.session.add(timetable_)
-
     async def get_by_id(self, course_run_id: UUID) -> TimetableEntity:
         query = (
-            select(Timetable)
-            .options(joinedload(Timetable.rules))
-            .filter_by(course_run_id=course_run_id.value, is_archive=False)
+            select(TimetableRule)
+            .filter_by(course_run_id=course_run_id.value)
         )
-        try:
-            result = await self.session.execute(query)
-            timetable_ = result.unique().scalars().one()
-            return timetable_.to_domain()
-        except NoResultFound as ex:
-            raise TimetableNotFoundError from ex
+        result = await self.session.execute(query)
+        timetable_rules = result.scalars().all()
+        return TimetableEntity(
+            id=course_run_id,
+            course_run_id=course_run_id,
+            rules=[rule.to_domain() for rule in timetable_rules],
+        )
 
     async def create_rule(self, rule: DayRuleEntity | WeekRuleEntity) -> None:
         rule_ = TimetableRule.from_domain(rule)

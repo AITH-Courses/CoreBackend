@@ -10,10 +10,10 @@ from src.domain.base_value_objects import UUID
 from src.domain.course_run.entities import CourseRunEntity
 from src.domain.course_run.exceptions import CourseRunAlreadyExistsError
 from src.domain.courses.value_objects import CourseRun
-from src.domain.timetable.entities import TimetableEntity
-from src.domain.timetable.exceptions import NoActualTimetableError, TimetableNotFoundError
+from src.domain.timetable.exceptions import NoActualTimetableError
 
 if TYPE_CHECKING:
+    from src.domain.timetable.entities import TimetableEntity
     from src.services.course_run.unit_of_work import CourseRunUnitOfWork
 
 
@@ -29,11 +29,8 @@ class CourseRunCommandService:
         course_id = UUID(course_id)
         course_run_name = CourseRun(f"{season} {year}")
         course_run = CourseRunEntity(course_run_id, course_id, course_run_name)
-        timetable_id = UUID(str(uuid.uuid4()))
-        timetable = TimetableEntity(timetable_id, course_run_id)
         try:
             await self.uow.course_run_repo.create(course_run)
-            await self.uow.timetable_repo.create(timetable)
             await self.uow.commit()
         except IntegrityError as ex:
             await self.uow.rollback()
@@ -70,13 +67,8 @@ class CourseRunCommandService:
         for course_run in course_runs:
             if course_run.is_actual_by_date(current_date):
                 error_message = "Для актуального запуска еще не создано расписание"
-                try:
-                    timetable = await self.uow.timetable_repo.get_by_id(course_run.id)
-                    if not timetable.lessons:
-                        raise NoActualTimetableError(error_message=error_message)
-                except TimetableNotFoundError as ex:
-                    raise NoActualTimetableError(error_message=error_message) from ex
-                else:
-                    return timetable, course_run
+                timetable = await self.uow.timetable_repo.get_by_id(course_run.id)
+                if not timetable.lessons:
+                    raise NoActualTimetableError(error_message=error_message)
+                return timetable, course_run
         raise NoActualTimetableError(error_message="Для курса еще не создан актуальный запуск")
-

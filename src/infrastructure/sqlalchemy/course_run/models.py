@@ -31,7 +31,7 @@ class CourseRun(Base):
         onupdate=datetime.datetime.utcnow,
     )
 
-    __table_args__ = (UniqueConstraint("course_id", "name", name="uix_name_email"),)
+    __table_args__ = (UniqueConstraint("course_id", "name", name="uix_course_id_name"),)
 
     @staticmethod
     def from_domain(course_run: CourseRunEntity) -> CourseRun:

@@ -71,7 +71,7 @@ class TimetableEntity:
 
     """Entity of timetable."""
 
-    id: UUID
+    id: UUID  # соответствует course_run_id
     course_run_id: UUID
     rules: list[DayRuleEntity | WeekRuleEntity] = field(default_factory=list)
 

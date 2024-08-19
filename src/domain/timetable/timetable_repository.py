@@ -13,10 +13,6 @@ class ITimetableRepository(ABC):
     """Interface of Repository for Timetable."""
 
     @abstractmethod
-    async def create(self, timetable: TimetableEntity) -> None:
-        raise NotImplementedError
-
-    @abstractmethod
     async def get_by_id(self, course_run_id: UUID) -> TimetableEntity:
         raise NotImplementedError
 

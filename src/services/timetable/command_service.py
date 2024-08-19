@@ -24,11 +24,11 @@ class TimetableCommandService:
         return await self.uow.timetable_repo.get_by_id(course_run_id)
 
     async def create_day_rule(
-            self, timetable_id: str, start_time: datetime.time, end_time: datetime.time, date: datetime.date,
+            self, course_run_id: str, start_time: datetime.time, end_time: datetime.time, date: datetime.date,
     ) -> str:
         rule_id = UUID(str(uuid.uuid4()))
-        timetable_id = UUID(timetable_id)
-        rule = DayRuleEntity(rule_id, timetable_id, start_time, end_time, date)
+        course_run_id = UUID(course_run_id)
+        rule = DayRuleEntity(rule_id, course_run_id, start_time, end_time, date)
         try:
             await self.uow.timetable_repo.create_rule(rule)
             await self.uow.commit()
@@ -38,13 +38,15 @@ class TimetableCommandService:
         return rule_id.value
 
     async def create_week_rule(
-            self, timetable_id: str, start_time: datetime.time, end_time: datetime.time,
+            self, course_run_id: str, start_time: datetime.time, end_time: datetime.time,
             start_period_date: datetime.date, end_period_date: datetime.date, weekdays: list[str],
     ) -> str:
         rule_id = UUID(str(uuid.uuid4()))
-        timetable_id = UUID(timetable_id)
+        course_run_id = UUID(course_run_id)
         weekdays = [Weekday(wd) for wd in weekdays]
-        rule = WeekRuleEntity(rule_id, timetable_id, start_time, end_time, start_period_date, end_period_date, weekdays)
+        rule = WeekRuleEntity(
+            rule_id, course_run_id, start_time, end_time, start_period_date, end_period_date, weekdays,
+        )
         try:
             await self.uow.timetable_repo.create_rule(rule)
             await self.uow.commit()
@@ -54,12 +56,12 @@ class TimetableCommandService:
         return rule_id.value
 
     async def update_day_rule(
-            self, rule_id: str, timetable_id: str, start_time: datetime.time,
+            self, rule_id: str, course_run_id: str, start_time: datetime.time,
             end_time: datetime.time, date: datetime.date,
     ) -> None:
         rule_id = UUID(rule_id)
-        timetable_id = UUID(timetable_id)
-        rule = DayRuleEntity(rule_id, timetable_id, start_time, end_time, date)
+        course_run_id = UUID(course_run_id)
+        rule = DayRuleEntity(rule_id, course_run_id, start_time, end_time, date)
         try:
             await self.uow.timetable_repo.update_rule(rule)
             await self.uow.commit()
@@ -68,13 +70,15 @@ class TimetableCommandService:
             raise
 
     async def update_week_rule(
-            self, rule_id: str, timetable_id: str, start_time: datetime.time, end_time: datetime.time,
+            self, rule_id: str, course_run_id: str, start_time: datetime.time, end_time: datetime.time,
             start_period_date: datetime.date, end_period_date: datetime.date, weekdays: list[str],
     ) -> None:
         rule_id = UUID(rule_id)
-        timetable_id = UUID(timetable_id)
+        course_run_id = UUID(course_run_id)
         weekdays = [Weekday(wd) for wd in weekdays]
-        rule = WeekRuleEntity(rule_id, timetable_id, start_time, end_time, start_period_date, end_period_date, weekdays)
+        rule = WeekRuleEntity(
+            rule_id, course_run_id, start_time, end_time, start_period_date, end_period_date, weekdays,
+        )
         try:
             await self.uow.timetable_repo.update_rule(rule)
             await self.uow.commit()
