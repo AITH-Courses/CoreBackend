@@ -63,7 +63,7 @@ class CourseRunCommandService:
         course_id = UUID(course_id)
         return await self.uow.course_run_repo.get_all_by_course_id(course_id)
 
-    async def get_actual_timetable_by_id(self, course_id: str) -> TimetableEntity:
+    async def get_actual_timetable_by_id(self, course_id: str) -> tuple[TimetableEntity, CourseRunEntity]:
         current_date = datetime.datetime.now().date()
         course_id = UUID(course_id)
         course_runs = await self.uow.course_run_repo.get_all_by_course_id(course_id)
@@ -77,6 +77,6 @@ class CourseRunCommandService:
                 except TimetableNotFoundError as ex:
                     raise NoActualTimetableError(error_message=error_message) from ex
                 else:
-                    return timetable
+                    return timetable, course_run
         raise NoActualTimetableError(error_message="Для курса еще не создан актуальный запуск")
 

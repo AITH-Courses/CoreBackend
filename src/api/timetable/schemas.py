@@ -23,9 +23,10 @@ class TimetableDTO(BaseModel):
     """Schema for timetable."""
 
     lessons: list[LessonDTO]
+    course_run_name: str
 
     @staticmethod
-    def from_domain(timetable: TimetableEntity) -> TimetableDTO:
+    def from_domain(timetable: TimetableEntity, course_run_name: str) -> TimetableDTO:
         current_lessons = timetable.lessons
         return TimetableDTO(
             lessons=[
@@ -34,4 +35,5 @@ class TimetableDTO(BaseModel):
                     end_time=lesson.end_time.time(),
                     date=lesson.start_time.date(),
                 ) for lesson in current_lessons],
+            course_run_name=course_run_name
         )

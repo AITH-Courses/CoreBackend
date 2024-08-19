@@ -36,10 +36,10 @@ async def get_timetable_for_course(
     :return:
     """
     try:
-        timetable = await command_service.get_actual_timetable_by_id(course_id)
+        timetable, course_run = await command_service.get_actual_timetable_by_id(course_id)
         return JSONResponse(
             status_code=status.HTTP_200_OK,
-            content=TimetableDTO.from_domain(timetable).model_dump(mode="json"),
+            content=TimetableDTO.from_domain(timetable, course_run.name.value).model_dump(mode="json"),
         )
     except NoActualTimetableError as ex:
         return JSONResponse(
