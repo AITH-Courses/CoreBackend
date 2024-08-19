@@ -31,7 +31,7 @@ class TimetableDTO(BaseModel):
             lessons=[
                 LessonDTO(
                     start_time=lesson.start_time.time(),
-                    end_time=lesson.start_time.time(),
+                    end_time=lesson.end_time.time(),
                     date=lesson.start_time.date(),
                 ) for lesson in current_lessons],
         )
