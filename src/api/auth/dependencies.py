@@ -5,8 +5,6 @@ from typing import TYPE_CHECKING
 from fastapi import Depends, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
-from src.api.auth.schemas import UserDTO
-from src.domain.auth.entities import UserEntity
 from src.domain.auth.exceptions import UserBySessionNotFoundError
 from src.exceptions import ApplicationError
 from src.infrastructure.redis.auth.session_service import RedisSessionService
@@ -18,6 +16,8 @@ from src.services.auth.command_service import AuthCommandService
 if TYPE_CHECKING:
     from redis.asyncio import Redis
     from sqlalchemy.ext.asyncio import AsyncSession
+
+    from src.domain.auth.entities import UserEntity
 
 
 def get_auth_service(
@@ -60,8 +60,7 @@ async def get_user(
     :return:
     """
     try:
-        user = await auth_service.me(auth_token)
-        return user
+        return await auth_service.me(auth_token)
     except UserBySessionNotFoundError as ex:
         raise ApplicationError(
             message="Требуется перезайти в аккаунт",
@@ -83,7 +82,6 @@ async def get_user_or_anonym(
     try:
         if not credentials:
             return anonym
-        user = await auth_service.me(credentials.credentials)
-        return user
+        return await auth_service.me(credentials.credentials)
     except UserBySessionNotFoundError:
         return anonym

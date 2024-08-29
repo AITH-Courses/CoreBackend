@@ -10,7 +10,6 @@ from src.api.admin.courses.schemas import CreateCourseRequest, CreateCourseRespo
 from src.api.base_schemas import ErrorResponse, SuccessResponse
 from src.api.courses.dependencies import get_courses_command_service, get_talent_courses_query_service
 from src.api.courses.schemas import CourseFullDTO, CourseShortDTO
-from src.domain.auth.entities import UserEntity
 from src.domain.courses.exceptions import (
     CourseAlreadyExistsError,
     CourseNotFoundError,
@@ -21,10 +20,10 @@ from src.domain.courses.exceptions import (
 )
 
 if TYPE_CHECKING:
+    from src.domain.auth.entities import UserEntity
     from src.services.courses.command_service import CourseCommandService
     from src.services.courses.query_service_for_admin import AdminCourseQueryService
     from src.services.courses.query_service_for_talent import TalentCourseQueryService
-
 
 router = APIRouter(prefix="/admin/courses", tags=["admin"])
 

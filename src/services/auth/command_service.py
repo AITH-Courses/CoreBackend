@@ -40,11 +40,10 @@ class AuthCommandService:
             await self.uow.commit()
         except IntegrityError as ex:
             await self.uow.rollback()
-            table_name = re.search(r"table '(.*?)'", str(ex)).group(1)
+            table_name = re.search(r"INSERT INTO (\w+)", ex.statement).group(1)
             if table_name == "users":
                 raise UserWithEmailExistsError from ex
-            else:
-                raise TalentProfileAlreadyExistsError from ex
+            raise TalentProfileAlreadyExistsError from ex
         await self.session_service.set(auth_token, user)
         return auth_token
 

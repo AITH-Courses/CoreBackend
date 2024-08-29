@@ -45,5 +45,5 @@ class UserDTO(BaseModel):
             firstname=user.firstname.value,
             lastname=user.lastname.value,
             email=user.email.value,
-            role=user.role.value
+            role=user.role.value,
         )

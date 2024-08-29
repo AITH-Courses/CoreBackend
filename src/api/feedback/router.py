@@ -9,7 +9,6 @@ from src.api.auth.dependencies import get_user, get_user_or_anonym
 from src.api.base_schemas import ErrorResponse, SuccessResponse
 from src.api.feedback.dependencies import get_feedback_command_service, get_feedback_query_service
 from src.api.feedback.schemas import CreateFeedbackRequest, CreateFeedbackResponse, FeedbackDTO, VoteDTO
-from src.domain.auth.entities import UserEntity
 from src.domain.courses.exceptions import EmptyPropertyError, ValueDoesntExistError
 from src.domain.feedback.exceptions import (
     FeedbackBelongsToAnotherUserError,
@@ -19,8 +18,10 @@ from src.domain.feedback.exceptions import (
 )
 
 if TYPE_CHECKING:
+    from src.domain.auth.entities import UserEntity
     from src.services.feedback.command_service import FeedbackCommandService
     from src.services.feedback.query_service import FeedbackQueryService
+
 
 router = APIRouter(prefix="/courses", tags=["courses"])
 
