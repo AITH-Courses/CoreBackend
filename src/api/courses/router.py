@@ -56,7 +56,7 @@ async def get_courses(
     """
     filters = CourseFilter(terms=terms, roles=roles, implementers=implementers, formats=formats)
     courses = await query_service.get_courses(filters)
-    paginator = Paginator[CourseEntity](data=courses, page_size=12)
+    paginator = Paginator[CourseEntity](data=courses, page_size=9)
     try:
         return JSONResponse(
             status_code=status.HTTP_200_OK,
