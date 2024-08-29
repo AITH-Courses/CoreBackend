@@ -10,6 +10,7 @@ from src.api.admin.courses.schemas import CreateCourseRequest, CreateCourseRespo
 from src.api.base_schemas import ErrorResponse, SuccessResponse
 from src.api.courses.dependencies import get_courses_command_service, get_talent_courses_query_service
 from src.api.courses.schemas import CourseFullDTO, CourseShortDTO
+from src.domain.auth.entities import UserEntity
 from src.domain.courses.exceptions import (
     CourseAlreadyExistsError,
     CourseNotFoundError,
@@ -20,7 +21,6 @@ from src.domain.courses.exceptions import (
 )
 
 if TYPE_CHECKING:
-    from src.api.auth.schemas import UserDTO
     from src.services.courses.command_service import CourseCommandService
     from src.services.courses.query_service_for_admin import AdminCourseQueryService
     from src.services.courses.query_service_for_talent import TalentCourseQueryService
@@ -52,7 +52,7 @@ router = APIRouter(prefix="/admin/courses", tags=["admin"])
 )
 async def create_course(
     data: CreateCourseRequest = Body(),
-    _: UserDTO = Depends(get_admin),
+    _: UserEntity = Depends(get_admin),
     command_service: CourseCommandService = Depends(get_courses_command_service),
     admin_query_service: AdminCourseQueryService = Depends(get_admin_courses_query_service),
     talent_query_service: TalentCourseQueryService = Depends(get_talent_courses_query_service),
@@ -115,7 +115,7 @@ async def create_course(
 async def update_course(
     course_id: str = Path(),
     data: UpdateCourseRequest = Body(),
-    _: UserDTO = Depends(get_admin),
+    _: UserEntity = Depends(get_admin),
     command_service: CourseCommandService = Depends(get_courses_command_service),
     admin_query_service: AdminCourseQueryService = Depends(get_admin_courses_query_service),
     talent_query_service: TalentCourseQueryService = Depends(get_talent_courses_query_service),
@@ -186,7 +186,7 @@ async def update_course(
 )
 async def delete_course(
     course_id: str = Path(),
-    _: UserDTO = Depends(get_admin),
+    _: UserEntity = Depends(get_admin),
     command_service: CourseCommandService = Depends(get_courses_command_service),
     admin_query_service: AdminCourseQueryService = Depends(get_admin_courses_query_service),
     talent_query_service: TalentCourseQueryService = Depends(get_talent_courses_query_service),
@@ -234,7 +234,7 @@ async def delete_course(
 )
 async def get_course(
     course_id: str = Path(),
-    _: UserDTO = Depends(get_admin),
+    _: UserEntity = Depends(get_admin),
     query_service: AdminCourseQueryService = Depends(get_admin_courses_query_service),
 ) -> JSONResponse:
     """Get course.
@@ -271,7 +271,7 @@ async def get_course(
     response_model=list[CourseShortDTO],
 )
 async def get_courses(
-    _: UserDTO = Depends(get_admin),
+    _: UserEntity = Depends(get_admin),
     query_service: AdminCourseQueryService = Depends(get_admin_courses_query_service),
 ) -> list[CourseShortDTO]:
     """Get courses.
@@ -307,7 +307,7 @@ async def get_courses(
 )
 async def publish_course(
     course_id: str = Path(),
-    _: UserDTO = Depends(get_admin),
+    _: UserEntity = Depends(get_admin),
     command_service: CourseCommandService = Depends(get_courses_command_service),
     admin_query_service: AdminCourseQueryService = Depends(get_admin_courses_query_service),
     talent_query_service: TalentCourseQueryService = Depends(get_talent_courses_query_service),
@@ -364,7 +364,7 @@ async def publish_course(
 )
 async def hide_course(
     course_id: str = Path(),
-    _: UserDTO = Depends(get_admin),
+    _: UserEntity = Depends(get_admin),
     command_service: CourseCommandService = Depends(get_courses_command_service),
     admin_query_service: AdminCourseQueryService = Depends(get_admin_courses_query_service),
     talent_query_service: TalentCourseQueryService = Depends(get_talent_courses_query_service),

@@ -1,5 +1,7 @@
 from pydantic import BaseModel, Field
 
+from src.domain.auth.entities import UserEntity
+
 
 class AuthTokenResponse(BaseModel):
 
@@ -35,3 +37,13 @@ class UserDTO(BaseModel):
     lastname: str = Field("Stark")
     email: str = Field("john@mail.com")
     role: str = Field("talent")
+
+    @staticmethod
+    def from_entity(user: UserEntity) -> "UserDTO":
+        return UserDTO(
+            id=user.id.value,
+            firstname=user.firstname.value,
+            lastname=user.lastname.value,
+            email=user.email.value,
+            role=user.role.value
+        )

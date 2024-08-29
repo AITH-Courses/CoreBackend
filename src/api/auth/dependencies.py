@@ -6,6 +6,7 @@ from fastapi import Depends, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 
 from src.api.auth.schemas import UserDTO
+from src.domain.auth.entities import UserEntity
 from src.domain.auth.exceptions import UserBySessionNotFoundError
 from src.exceptions import ApplicationError
 from src.infrastructure.redis.auth.session_service import RedisSessionService
@@ -51,7 +52,7 @@ def get_auth_token(credentials: HTTPAuthorizationCredentials = Depends(HTTPBeare
 async def get_user(
         auth_token: str = Depends(get_auth_token),
         auth_service: AuthCommandService = Depends(get_auth_service),
-) -> UserDTO:
+) -> UserEntity:
     """Get user on auth token.
 
     :param auth_token:
@@ -60,13 +61,7 @@ async def get_user(
     """
     try:
         user = await auth_service.me(auth_token)
-        return UserDTO(
-            id=user.id.value,
-            firstname=user.firstname.value,
-            lastname=user.lastname.value,
-            email=user.email.value,
-            role=user.role.value,
-        )
+        return user
     except UserBySessionNotFoundError as ex:
         raise ApplicationError(
             message="Требуется перезайти в аккаунт",
@@ -77,7 +72,7 @@ async def get_user(
 async def get_user_or_anonym(
         credentials: HTTPAuthorizationCredentials = Depends(HTTPBearer(auto_error=False)),
         auth_service: AuthCommandService = Depends(get_auth_service),
-) -> UserDTO | None:
+) -> UserEntity | None:
     """Get user on auth token or anonym.
 
     :param credentials:
@@ -89,12 +84,6 @@ async def get_user_or_anonym(
         if not credentials:
             return anonym
         user = await auth_service.me(credentials.credentials)
-        return UserDTO(
-            id=user.id.value,
-            firstname=user.firstname.value,
-            lastname=user.lastname.value,
-            email=user.email.value,
-            role=user.role.value,
-        )
+        return user
     except UserBySessionNotFoundError:
         return anonym
