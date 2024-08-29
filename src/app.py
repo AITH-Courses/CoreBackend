@@ -10,6 +10,7 @@ from src.api.base_schemas import ErrorResponse
 from src.api.courses.router import router as course_router
 from src.api.feedback.router import router as feedback_router
 from src.api.health_check import router as health_check_router
+from src.api.talent_profile.router import router as talent_profile_router
 from src.api.timetable.router import router as course_timetable_router
 from src.config import app_config
 from src.domain.base_exceptions import IncorrectUUIDError
@@ -65,6 +66,7 @@ def add_routers(application: FastAPI) -> None:
     application.include_router(router=admin_course_router, prefix="/api/v1")
     application.include_router(router=admin_course_run_router, prefix="/api/v1")
     application.include_router(router=admin_timetable_router, prefix="/api/v1")
+    application.include_router(router=talent_profile_router, prefix="/api/v1")
 
 
 def add_cors(application: FastAPI) -> None:
