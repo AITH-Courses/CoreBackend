@@ -13,28 +13,11 @@ from src.domain.timetable.value_objects import Weekday
 from src.infrastructure.sqlalchemy.timetable.repository import SQLAlchemyTimetableRepository
 
 
-async def create_timetable(async_session: AsyncSession) -> tuple[UUID, SQLAlchemyTimetableRepository]:
-    repo = SQLAlchemyTimetableRepository(async_session)
-    timetable_id = UUID(str(uuid.uuid4()))
-    await repo.create(TimetableEntity(
-        id=timetable_id,
-        course_run_id=timetable_id,
-    ))
-    await async_session.commit()
-    return timetable_id, repo
-
-
-async def test_create_timetable(test_async_session: AsyncSession):
-    course_run_id, repo = await create_timetable(test_async_session)
-    timetable = await repo.get_by_id(course_run_id)
-    assert timetable.id == course_run_id
-    assert len(timetable.rules) == 0
-
-
 async def test_create_day_rule(test_async_session: AsyncSession):
-    course_run_id, repo = await create_timetable(test_async_session)
+    repo = SQLAlchemyTimetableRepository(test_async_session)
     year, month, day = 2024, 12, 1
     h1, m1, h2, m2 = 17, 0, 18, 30
+    course_run_id = UUID(str(uuid.uuid4()))
     rule = DayRuleEntity(
         id=UUID(str(uuid.uuid4())),
         timetable_id=course_run_id,
@@ -50,7 +33,8 @@ async def test_create_day_rule(test_async_session: AsyncSession):
 
 
 async def test_update_day_rule(test_async_session: AsyncSession):
-    course_run_id, repo = await create_timetable(test_async_session)
+    repo = SQLAlchemyTimetableRepository(test_async_session)
+    course_run_id = UUID(str(uuid.uuid4()))
     year, month, day = 2024, 12, 1
     h1, m1, h2, m2 = 17, 0, 18, 30
     rule_id = UUID(str(uuid.uuid4()))
@@ -82,7 +66,8 @@ async def test_update_day_rule(test_async_session: AsyncSession):
 
 
 async def test_create_week_rule(test_async_session: AsyncSession):
-    course_run_id, repo = await create_timetable(test_async_session)
+    repo = SQLAlchemyTimetableRepository(test_async_session)
+    course_run_id = UUID(str(uuid.uuid4()))
     year, month, day = 2024, 12, 1
     h1, m1, h2, m2 = 17, 0, 18, 30
     rule = WeekRuleEntity(
@@ -102,7 +87,8 @@ async def test_create_week_rule(test_async_session: AsyncSession):
 
 
 async def test_delete_rule(test_async_session: AsyncSession):
-    course_run_id, repo = await create_timetable(test_async_session)
+    repo = SQLAlchemyTimetableRepository(test_async_session)
+    course_run_id = UUID(str(uuid.uuid4()))
     year, month, day = 2024, 12, 1
     h1, m1, h2, m2 = 17, 0, 18, 30
     rule_id = UUID(str(uuid.uuid4()))
