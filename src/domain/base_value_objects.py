@@ -55,7 +55,7 @@ class EmptyLinkValueObject:
 
         :param value:
         """
-        pattern = r"^https?://[^\s]+\.py$"
+        pattern = r"^https?://[^\s]+"
         if value == "" or re.match(pattern, value):
             object.__setattr__(self, "value", value)
         else:
