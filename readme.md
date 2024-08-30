@@ -10,7 +10,7 @@ docker-compose -f dev.docker-compose.yaml up -d
 
 ### Запуск приложения
 ```bash
-poetry run uvicorn src.app:app
+poetry run uvicorn src.app:app --port 5000 --reload
 ```
 
 ### Миграции
