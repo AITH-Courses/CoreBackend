@@ -1,24 +1,13 @@
-from abc import ABC, abstractmethod
+from abc import ABC
 
 from src.domain.auth.user_repository import IUserRepository
 from src.domain.talent_profile.profile_repository import ITalentProfileRepository
+from src.services.base_unit_of_work import ServiceUnitOfWork
 
 
-class TalentProfileUnitOfWork(ABC):
+class TalentProfileUnitOfWork(ServiceUnitOfWork, ABC):
 
     """Base class implemented pattern Unit of Work."""
 
     user_repo: IUserRepository
     profile_repo: ITalentProfileRepository
-
-    @abstractmethod
-    async def begin(self) -> None:
-        raise NotImplementedError
-
-    @abstractmethod
-    async def commit(self) -> None:
-        raise NotImplementedError
-
-    @abstractmethod
-    async def rollback(self) -> None:
-        raise NotImplementedError
