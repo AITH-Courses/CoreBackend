@@ -100,3 +100,10 @@ class CoursesPaginationResponse(BaseModel):
 
     courses: list[CourseShortDTO]
     max_page: int
+
+
+class CourseFavoriteStatusResponse(BaseModel):
+
+    """Schema of favorite status."""
+
+    is_favorite: bool
