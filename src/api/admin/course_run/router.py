@@ -4,8 +4,8 @@ from fastapi.responses import JSONResponse
 from src.api.admin.course_run.dependencies import get_admin_course_run_command_service
 from src.api.admin.course_run.schemas import CourseRunDTO, CreateCourseRunRequest, CreateCourseRunResponse
 from src.api.admin.courses.dependencies import get_admin
-from src.api.auth.schemas import UserDTO
 from src.api.base_schemas import ErrorResponse, SuccessResponse
+from src.domain.auth.entities import UserEntity
 from src.domain.course_run.exceptions import CourseRunAlreadyExistsError, CourseRunNotFoundError
 from src.domain.courses.exceptions import IncorrectCourseRunNameError
 from src.services.course_run.command_service import CourseRunCommandService
@@ -28,7 +28,7 @@ router = APIRouter(prefix="/admin/courses/{course_id}/runs", tags=["admin"])
 )
 async def get_all_course_runs(
     course_id: str,
-    _: UserDTO = Depends(get_admin),
+    _: UserEntity = Depends(get_admin),
     command_service: CourseRunCommandService = Depends(get_admin_course_run_command_service),
 ) -> JSONResponse:
     """Get course runs.
@@ -62,7 +62,7 @@ async def get_all_course_runs(
 async def get_one_course_run(
     course_id: str,
     course_run_id: str,
-    _: UserDTO = Depends(get_admin),
+    _: UserEntity = Depends(get_admin),
     command_service: CourseRunCommandService = Depends(get_admin_course_run_command_service),
 ) -> JSONResponse:
     """Get course run.
@@ -106,7 +106,7 @@ async def get_one_course_run(
 async def create_course_run(
     course_id: str,
     data: CreateCourseRunRequest = Body(),
-    _: UserDTO = Depends(get_admin),
+    _: UserEntity = Depends(get_admin),
     command_service: CourseRunCommandService = Depends(get_admin_course_run_command_service),
 ) -> JSONResponse:
     """Create course run.
@@ -151,7 +151,7 @@ async def create_course_run(
 async def delete_course_run(
     course_id: str,
     course_run_id: str,
-    _: UserDTO = Depends(get_admin),
+    _: UserEntity = Depends(get_admin),
     command_service: CourseRunCommandService = Depends(get_admin_course_run_command_service),
 ) -> JSONResponse:
     """Delete course run.

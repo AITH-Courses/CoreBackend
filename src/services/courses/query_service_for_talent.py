@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
 from src.domain.base_value_objects import UUID
@@ -17,10 +17,10 @@ class CourseFilter:
 
     """Class for filters on courses."""
 
-    implementers: list[str] | None
-    formats: list[str] | None
-    terms: list[str] | None
-    roles: list[str] | None
+    implementers: list[str] | None = field(default=None)
+    formats: list[str] | None = field(default=None)
+    terms: list[str] | None = field(default=None)
+    roles: list[str] | None = field(default=None)
 
 
 class TalentCourseQueryService:

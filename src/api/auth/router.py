@@ -9,6 +9,7 @@ from src.api.auth.schemas import (
     UserDTO,
 )
 from src.api.base_schemas import ErrorResponse, SuccessResponse
+from src.domain.auth.entities import UserEntity
 from src.domain.auth.exceptions import (
     EmailNotValidError,
     EmptyPartOfNameError,
@@ -172,7 +173,7 @@ async def logout_user(
     response_model=UserDTO,
 )
 async def get_current_user(
-    user: UserDTO = Depends(get_user),
+    user: UserEntity = Depends(get_user),
 ) -> JSONResponse:
     """Get current user on auth token.
 
@@ -180,6 +181,6 @@ async def get_current_user(
     :return:
     """
     return JSONResponse(
-        content=user.model_dump(),
+        content=UserDTO.from_entity(user).model_dump(),
         status_code=status.HTTP_200_OK,
     )

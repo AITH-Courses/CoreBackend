@@ -4,8 +4,8 @@ from fastapi.responses import JSONResponse
 from src.api.admin.courses.dependencies import get_admin
 from src.api.admin.timetable.dependencies import get_admin_timetable_command_service
 from src.api.admin.timetable.schemas import CreateOrUpdateRuleRequest, CreateRuleResponse, TimetableDTO
-from src.api.auth.schemas import UserDTO
 from src.api.base_schemas import ErrorResponse, SuccessResponse
+from src.domain.auth.entities import UserEntity
 from src.domain.timetable.exceptions import IncorrectRuleTypeError, RuleNotFoundError
 from src.services.timetable.command_service import TimetableCommandService
 
@@ -32,7 +32,7 @@ router = APIRouter(prefix="/admin/courses/{course_id}/runs/{course_run_id}/timet
 async def get_timetable(
     course_id: str,
     course_run_id: str,
-    _: UserDTO = Depends(get_admin),
+    _: UserEntity = Depends(get_admin),
     command_service: TimetableCommandService = Depends(get_admin_timetable_command_service),
 ) -> JSONResponse:
     """Get timetable.
@@ -67,7 +67,7 @@ async def create_rule(
     course_id: str,
     course_run_id: str,
     data: CreateOrUpdateRuleRequest = Body(),
-    _: UserDTO = Depends(get_admin),
+    _: UserEntity = Depends(get_admin),
     command_service: TimetableCommandService = Depends(get_admin_timetable_command_service),
 ) -> JSONResponse:
     """Create rule.
@@ -121,7 +121,7 @@ async def delete_rule(
     course_id: str,
     course_run_id: str,
     rule_id: str,
-    _: UserDTO = Depends(get_admin),
+    _: UserEntity = Depends(get_admin),
     command_service: TimetableCommandService = Depends(get_admin_timetable_command_service),
 ) -> JSONResponse:
     """Delete rule.
@@ -167,7 +167,7 @@ async def update_rule(
     course_run_id: str,
     rule_id: str,
     data: CreateOrUpdateRuleRequest = Body(),
-    _: UserDTO = Depends(get_admin),
+    _: UserEntity = Depends(get_admin),
     command_service: TimetableCommandService = Depends(get_admin_timetable_command_service),
 ) -> JSONResponse:
     """Update rule.

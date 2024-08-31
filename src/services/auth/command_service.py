@@ -1,3 +1,4 @@
+import re
 import uuid
 
 from sqlalchemy.exc import IntegrityError
@@ -7,6 +8,8 @@ from src.domain.auth.entities import UserEntity
 from src.domain.auth.exceptions import UserWithEmailExistsError
 from src.domain.auth.value_objects import Email, PartOfName, UserRole
 from src.domain.base_value_objects import UUID
+from src.domain.talent_profile.entities import TalentProfileEntity
+from src.domain.talent_profile.exceptions import TalentProfileAlreadyExistsError
 from src.infrastructure.security.password_service import PasswordService
 from src.services.auth.session_service import SessionService
 from src.services.auth.unit_of_work import AuthUnitOfWork
@@ -30,12 +33,17 @@ class AuthCommandService:
         hashed_password = PasswordService.create_hashed_password(password_)
         user = UserEntity(user_id, firstname, lastname, role, email, hashed_password)
         auth_token = str(uuid.uuid4())
+        profile = TalentProfileEntity(user_id)
         try:
             await self.uow.user_repo.create(user)
+            await self.uow.profile_repo.create(profile)
             await self.uow.commit()
         except IntegrityError as ex:
             await self.uow.rollback()
-            raise UserWithEmailExistsError from ex
+            table_name = re.search(r"INSERT INTO (\w+)", ex.statement).group(1)
+            if table_name == "users":
+                raise UserWithEmailExistsError from ex
+            raise TalentProfileAlreadyExistsError from ex
         await self.session_service.set(auth_token, user)
         return auth_token
 

@@ -8,8 +8,10 @@ from src.api.admin.timetable.router import router as admin_timetable_router
 from src.api.auth.router import router as auth_router
 from src.api.base_schemas import ErrorResponse
 from src.api.courses.router import router as course_router
+from src.api.favorite_courses.router import router as favorite_courses_router
 from src.api.feedback.router import router as feedback_router
 from src.api.health_check import router as health_check_router
+from src.api.talent_profile.router import router as talent_profile_router
 from src.api.timetable.router import router as course_timetable_router
 from src.config import app_config
 from src.domain.base_exceptions import IncorrectUUIDError
@@ -57,14 +59,13 @@ def add_routers(application: FastAPI) -> None:
     :param application:
     :return: nothing
     """
-    application.include_router(router=health_check_router, prefix="/api/v1")
-    application.include_router(router=auth_router, prefix="/api/v1")
-    application.include_router(router=course_router, prefix="/api/v1")
-    application.include_router(router=course_timetable_router, prefix="/api/v1")
-    application.include_router(router=feedback_router, prefix="/api/v1")
-    application.include_router(router=admin_course_router, prefix="/api/v1")
-    application.include_router(router=admin_course_run_router, prefix="/api/v1")
-    application.include_router(router=admin_timetable_router, prefix="/api/v1")
+    routers = [
+        health_check_router, auth_router, course_router, course_timetable_router, feedback_router,
+        admin_course_router, admin_course_run_router, admin_timetable_router, talent_profile_router,
+        favorite_courses_router,
+    ]
+    for router in routers:
+        application.include_router(router=router, prefix="/api/v1")
 
 
 def add_cors(application: FastAPI) -> None:

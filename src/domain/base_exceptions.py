@@ -18,3 +18,12 @@ class IncorrectUUIDError(DomainError):
     @property
     def message(self) -> str:
         return "Identifier is not valid"
+
+
+class InvalidLinkError(DomainError):
+
+    """Error with invalid link."""
+
+    @property
+    def message(self) -> str:
+        return "Link is not valid"

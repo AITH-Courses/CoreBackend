@@ -12,6 +12,8 @@ from src.infrastructure.sqlalchemy.courses.models import Course, RunForCourse, R
 from src.infrastructure.sqlalchemy.feedback.models import Feedback, VoteForFeedback
 from src.infrastructure.sqlalchemy.course_run.models import CourseRun
 from src.infrastructure.sqlalchemy.timetable.models import TimetableRule
+from src.infrastructure.sqlalchemy.talent_profile.models import TalentProfile
+from src.infrastructure.sqlalchemy.favorite_courses.models import FavoriteCourse
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
