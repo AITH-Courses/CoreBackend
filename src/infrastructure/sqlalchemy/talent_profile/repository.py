@@ -29,6 +29,7 @@ class SQLAlchemyTalentProfileRepository(ITalentProfileRepository):
 
     async def update(self, profile: TalentProfileEntity) -> None:
         profile_ = await self.__get_by_id(profile.id)
+        profile_.image_url = profile.image_url
         profile_.location = profile.location
         profile_.position = profile.position
         profile_.company = profile.company
