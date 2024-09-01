@@ -46,15 +46,18 @@ router = APIRouter(prefix="/courses", tags=["courses"])
     response_model=list[CourseShortDTO],
 )
 async def get_courses(
-    terms: list[str] = Query(None),
-    roles: list[str] = Query(None),
-    implementers: list[str] = Query(None),
-    formats: list[str] = Query(None),
-    page: int = Query(1),
-    query_service: TalentCourseQueryService = Depends(get_talent_courses_query_service),
+        terms: list[str] = Query(None),
+        roles: list[str] = Query(None),
+        implementers: list[str] = Query(None),
+        formats: list[str] = Query(None),
+        page: int = Query(1),
+        *,
+        only_actual: bool = Query(default=False),
+        query_service: TalentCourseQueryService = Depends(get_talent_courses_query_service),
 ) -> JSONResponse:
     """Get courses.
 
+    :param only_actual:
     :param page:
     :param terms:
     :param roles:
@@ -63,7 +66,10 @@ async def get_courses(
     :param query_service:
     :return:
     """
-    filters = CourseFilter(terms=terms, roles=roles, implementers=implementers, formats=formats)
+    filters = CourseFilter(
+        terms=terms, roles=roles, implementers=implementers,
+        formats=formats, only_actual=only_actual,
+    )
     courses = await query_service.get_courses(filters)
     paginator = Paginator[CourseEntity](data=courses, page_size=9)
     try:
@@ -99,8 +105,8 @@ async def get_courses(
     response_model=CourseFullDTO,
 )
 async def get_course(
-    course_id: str,
-    query_service: TalentCourseQueryService = Depends(get_talent_courses_query_service),
+        course_id: str,
+        query_service: TalentCourseQueryService = Depends(get_talent_courses_query_service),
 ) -> JSONResponse:
     """Get courses.
 
@@ -139,9 +145,9 @@ async def get_course(
     response_model=CourseFavoriteStatusResponse,
 )
 async def get_favorite_status(
-    course_id: str,
-    user: UserEntity = Depends(get_user),
-    favorites_command_service: FavoriteCoursesCommandService = Depends(get_favorite_courses_command_service),
+        course_id: str,
+        user: UserEntity = Depends(get_user),
+        favorites_command_service: FavoriteCoursesCommandService = Depends(get_favorite_courses_command_service),
 ) -> JSONResponse:
     """Get courses.
 

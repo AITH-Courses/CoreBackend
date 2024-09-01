@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import datetime
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING
 
@@ -21,6 +22,7 @@ class CourseFilter:
     formats: list[str] | None = field(default=None)
     terms: list[str] | None = field(default=None)
     roles: list[str] | None = field(default=None)
+    only_actual: bool = field(default=False)
 
 
 class TalentCourseQueryService:
@@ -43,34 +45,38 @@ class TalentCourseQueryService:
         return course
 
     async def get_courses(self, filters: CourseFilter) -> list[CourseEntity]:
+        actual_run = self.__get_actual_run()
         courses_from_cache = await self.course_cache_service.get_many()
         if courses_from_cache:
-            return [course for course in courses_from_cache if not course.is_draft and self.__matched(course, filters)]
+            return [
+                course for course in courses_from_cache
+                if not course.is_draft and self.__matched(course, filters, actual_run)
+            ]
         courses = await self.course_repo.get_all()
         courses = [course for course in courses if not course.is_draft]
         await self.course_cache_service.set_many(courses)
-        return [course for course in courses if self.__matched(course, filters)]
+        return [course for course in courses if self.__matched(course, filters, actual_run)]
 
     async def invalidate_course(self, course_id: str) -> None:
         await self.course_cache_service.delete_one(UUID(course_id))
         await self.course_cache_service.delete_many()
 
     @staticmethod
-    def __matched(course: CourseEntity, filters: CourseFilter) -> bool:
-        if filters.roles:
-            course_roles = [r.value for r in course.roles]
-            if not set(filters.roles).intersection(set(course_roles)):
-                return False
-        if filters.implementers:
-            course_implementer = course.implementer.value
-            if course_implementer not in filters.implementers:
-                return False
-        if filters.terms:
-            course_terms = course.terms.value.split(", ")
-            if not set(filters.terms).intersection(set(course_terms)):
-                return False
-        if filters.formats:
-            course_format = course.format.value
-            if course_format not in filters.formats:
-                return False
-        return True
+    def __matched(course: CourseEntity, filters: CourseFilter, actual_run: str) -> bool:
+        if filters.roles and not set(filters.roles).intersection({r.value for r in course.roles}):
+            return False
+        if filters.implementers and course.implementer.value not in filters.implementers:
+            return False
+        if filters.terms and not set(filters.terms).intersection(set(course.terms.value.split(", "))):
+            return False
+        if filters.formats and course.format.value not in filters.formats:
+            return False
+        return not filters.only_actual or actual_run in {run.value for run in course.last_runs}
+
+    @staticmethod
+    def __get_actual_run() -> str:
+        current_date = datetime.datetime.now().date()
+        month, year = current_date.month, current_date.year
+        if month in (8, 9, 10, 11, 12):
+            return f"{'Осень'} {year}"
+        return f"{'Весна'} {year}"
