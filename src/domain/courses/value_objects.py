@@ -8,7 +8,6 @@ from src.domain.courses.constants import (
     IMPLEMENTERS,
     PERIODS,
     ROLES,
-    TERMS,
 )
 from src.domain.courses.exceptions import EmptyPropertyError, IncorrectCourseRunNameError, ValueDoesntExistError
 
@@ -93,9 +92,11 @@ class Terms:
 
         :param value:
         """
-        if value not in TERMS:
-            raise ValueDoesntExistError(property_name="terms")
-        object.__setattr__(self, "value", value)
+        digits = sorted([digit.strip() for digit in value.split(",")])
+        for digit in digits:
+            if not digit.isdigit():
+                raise ValueDoesntExistError(property_name="terms")
+        object.__setattr__(self, "value", ", ".join(digits))
 
 
 @dataclass(init=False, eq=True, frozen=True)
