@@ -9,6 +9,7 @@ from sqlalchemy.orm import joinedload
 
 from src.domain.courses.course_repository import ICourseRepository
 from src.domain.courses.exceptions import CourseNotFoundError
+from src.domain.courses.value_objects import CourseName
 from src.infrastructure.sqlalchemy.courses.models import Course, PeriodForCourse, RoleForCourse, RunForCourse
 
 if TYPE_CHECKING:
@@ -70,6 +71,21 @@ class SQLAlchemyCourseRepository(ICourseRepository):
     async def get_by_id(self, course_id: UUID) -> CourseEntity:
         try:
             course_ = await self.__get_by_id(course_id)
+            return course_.to_domain()
+        except NoResultFound as ex:
+            raise CourseNotFoundError from ex
+
+    async def get_by_name(self, course_name: CourseName) -> CourseEntity:
+        query = (
+            select(Course)
+            .options(joinedload(Course.roles))
+            .options(joinedload(Course.periods))
+            .options(joinedload(Course.runs))
+            .filter_by(name=course_name.value, is_archive=False)
+        )
+        try:
+            result = await self.session.execute(query)
+            course_ = result.unique().scalars().one()
             return course_.to_domain()
         except NoResultFound as ex:
             raise CourseNotFoundError from ex
