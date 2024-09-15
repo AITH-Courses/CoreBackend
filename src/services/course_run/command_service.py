@@ -10,6 +10,7 @@ from src.domain.base_value_objects import UUID
 from src.domain.course_run.entities import CourseRunEntity
 from src.domain.course_run.exceptions import CourseRunAlreadyExistsError
 from src.domain.courses.value_objects import CourseRun
+from src.domain.group_google_calendar.entities import GroupGoogleCalendarEntity
 from src.domain.timetable.exceptions import NoActualTimetableError
 
 if TYPE_CHECKING:
@@ -60,7 +61,9 @@ class CourseRunCommandService:
         course_id = UUID(course_id)
         return await self.uow.course_run_repo.get_all_by_course_id(course_id)
 
-    async def get_actual_timetable_by_id(self, course_id: str) -> tuple[TimetableEntity, CourseRunEntity]:
+    async def get_actual_timetable_by_id(
+            self, course_id: str
+    ) -> tuple[TimetableEntity, CourseRunEntity, list[GroupGoogleCalendarEntity]]:
         current_date = datetime.datetime.now().date()
         course_id = UUID(course_id)
         course_runs = await self.uow.course_run_repo.get_all_by_course_id(course_id)
@@ -68,7 +71,8 @@ class CourseRunCommandService:
             if course_run.is_actual_by_date(current_date):
                 error_message = "Для актуального запуска еще не создано расписание"
                 timetable = await self.uow.timetable_repo.get_by_id(course_run.id)
-                if not timetable.lessons:
+                google_timetable_groups = await self.uow.ggc_repo.get_all_by_course_run_id(course_run.id)
+                if not timetable.lessons and not google_timetable_groups:
                     raise NoActualTimetableError(error_message=error_message)
-                return timetable, course_run
+                return timetable, course_run, google_timetable_groups
         raise NoActualTimetableError(error_message="Для курса еще не создан актуальный запуск")

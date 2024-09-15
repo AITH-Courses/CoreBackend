@@ -2,6 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from src.infrastructure.sqlalchemy.base_unit_of_work import SQLAlchemyUnitOfWork
 from src.infrastructure.sqlalchemy.course_run.repository import SQLAlchemyCourseRunRepository
+from src.infrastructure.sqlalchemy.group_google_calendar.repository import SQLAlchemyGroupGoogleCalendarRepository
 from src.infrastructure.sqlalchemy.timetable.repository import SQLAlchemyTimetableRepository
 from src.services.course_run.unit_of_work import CourseRunUnitOfWork
 
@@ -14,3 +15,4 @@ class SQLAlchemyCourseRunUnitOfWork(SQLAlchemyUnitOfWork, CourseRunUnitOfWork):
         super().__init__(sqla_session)
         self.course_run_repo = SQLAlchemyCourseRunRepository(sqla_session)
         self.timetable_repo = SQLAlchemyTimetableRepository(sqla_session)
+        self.ggc_repo = SQLAlchemyGroupGoogleCalendarRepository(sqla_session)
