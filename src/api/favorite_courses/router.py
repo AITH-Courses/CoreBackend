@@ -83,10 +83,12 @@ async def get_favorite_courses(
 )
 async def remove_course_from_favorites(
     favorite_course_id: str,
+    _: UserEntity = Depends(get_user),
     favorites_command_service: FavoriteCoursesCommandService = Depends(get_favorite_courses_command_service),
 ) -> JSONResponse:
     """Get courses.
 
+    :param _:
     :param favorite_course_id:
     :param favorites_command_service:
     :return:

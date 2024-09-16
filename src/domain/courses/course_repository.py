@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 if TYPE_CHECKING:
     from src.domain.base_value_objects import UUID
     from src.domain.courses.entities import CourseEntity
+    from src.domain.courses.value_objects import CourseName
 
 class ICourseRepository(ABC):
 
@@ -29,6 +30,10 @@ class ICourseRepository(ABC):
 
     @abstractmethod
     async def get_by_id(self, course_id: UUID) -> CourseEntity:
+        raise NotImplementedError
+
+    @abstractmethod
+    async def get_by_name(self, course_name: CourseName) -> CourseEntity:
         raise NotImplementedError
 
     @abstractmethod

@@ -4,6 +4,8 @@ from fastapi.responses import JSONResponse
 
 from src.api.admin.course_run.router import router as admin_course_run_router
 from src.api.admin.courses.router import router as admin_course_router
+from src.api.admin.group_google_calendar.integration_router import router as integration_group_google_calendar_router
+from src.api.admin.group_google_calendar.router import router as group_google_calendar_router
 from src.api.admin.timetable.router import router as admin_timetable_router
 from src.api.auth.router import router as auth_router
 from src.api.base_schemas import ErrorResponse
@@ -62,7 +64,7 @@ def add_routers(application: FastAPI) -> None:
     routers = [
         health_check_router, auth_router, course_router, course_timetable_router, feedback_router,
         admin_course_router, admin_course_run_router, admin_timetable_router, talent_profile_router,
-        favorite_courses_router,
+        favorite_courses_router, group_google_calendar_router, integration_group_google_calendar_router,
     ]
     for router in routers:
         application.include_router(router=router, prefix="/api/v1")

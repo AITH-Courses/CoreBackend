@@ -16,6 +16,7 @@ if TYPE_CHECKING:
 
     from src.domain.base_value_objects import UUID
     from src.domain.courses.entities import CourseEntity
+    from src.domain.courses.value_objects import CourseName
 
 
 class SQLAlchemyCourseRepository(ICourseRepository):
@@ -70,6 +71,21 @@ class SQLAlchemyCourseRepository(ICourseRepository):
     async def get_by_id(self, course_id: UUID) -> CourseEntity:
         try:
             course_ = await self.__get_by_id(course_id)
+            return course_.to_domain()
+        except NoResultFound as ex:
+            raise CourseNotFoundError from ex
+
+    async def get_by_name(self, course_name: CourseName) -> CourseEntity:
+        query = (
+            select(Course)
+            .options(joinedload(Course.roles))
+            .options(joinedload(Course.periods))
+            .options(joinedload(Course.runs))
+            .filter_by(name=course_name.value, is_archive=False)
+        )
+        try:
+            result = await self.session.execute(query)
+            course_ = result.unique().scalars().one()
             return course_.to_domain()
         except NoResultFound as ex:
             raise CourseNotFoundError from ex
