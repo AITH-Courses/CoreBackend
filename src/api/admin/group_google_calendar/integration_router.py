@@ -37,7 +37,10 @@ async def update_google_calendar_links(
 
     :return:
     """
-    course = UpdateGroupGoogleCalendarDTO(data.name, [UpdateGroupDTO(g.name, g.link) for g in data.groups])
+    course = UpdateGroupGoogleCalendarDTO(
+        course_name=data.course.name,
+        groups=[UpdateGroupDTO(name=g.name, link=g.link) for g in data.course.groups]
+    )
     message = await command_service.update(course, data.course_run_name)
     return JSONResponse(
         status_code=status.HTTP_200_OK,
