@@ -39,7 +39,9 @@ async def get_timetable_for_course(
         timetable, course_run, google_calendar_groups = await command_service.get_actual_timetable_by_id(course_id)
         return JSONResponse(
             status_code=status.HTTP_200_OK,
-            content=TimetableDTO.from_domain(timetable, course_run.name.value, google_calendar_groups).model_dump(mode="json"),
+            content=TimetableDTO.from_domain(
+                timetable, course_run.name.value, google_calendar_groups,
+            ).model_dump(mode="json"),
         )
     except NoActualTimetableError as ex:
         return JSONResponse(

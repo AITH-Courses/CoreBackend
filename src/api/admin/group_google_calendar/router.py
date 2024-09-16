@@ -1,17 +1,20 @@
-from fastapi import APIRouter, Depends, status, Body
+from fastapi import APIRouter, Body, Depends, status
 from fastapi.responses import JSONResponse
 
 from src.api.admin.courses.dependencies import get_admin
 from src.api.admin.group_google_calendar.dependencies import get_group_google_calendar_service
 from src.api.admin.group_google_calendar.schemas import CreateGroupGoogleCalendarRequest
-from src.api.base_schemas import SuccessResponse, ErrorResponse
+from src.api.base_schemas import ErrorResponse, SuccessResponse
 from src.api.timetable.schemas import GroupGoogleCalendarDTO
 from src.domain.auth.entities import UserEntity
 from src.domain.base_exceptions import InvalidLinkError
 from src.domain.group_google_calendar.exceptions import GroupGoogleCalendarNotFoundError
 from src.services.group_google_calendar.command_service import GroupGoogleCalendarCommandService
 
-router = APIRouter(prefix="/admin/courses/{course_id}/runs/{course_run_id}/timetable/google_calendar_groups", tags=["admin"])
+router = APIRouter(
+    prefix="/admin/courses/{course_id}/runs/{course_run_id}/timetable/google_calendar_groups",
+    tags=["admin"],
+)
 
 
 @router.post(
@@ -46,7 +49,7 @@ async def create_group_google_calendar(
         await command_service.create(course_run_id, data.name, data.link)
         return JSONResponse(
             status_code=status.HTTP_201_CREATED,
-            content=SuccessResponse(message="Ссылка на google calendar успешно создана").model_dump(mode="json")
+            content=SuccessResponse(message="Ссылка на google calendar успешно создана").model_dump(mode="json"),
         )
     except InvalidLinkError as ex:
         return JSONResponse(
@@ -64,7 +67,7 @@ async def create_group_google_calendar(
         status.HTTP_200_OK: {
             "model": list[GroupGoogleCalendarDTO],
             "description": "Google calendar has been deleted",
-        }
+        },
     },
     response_model=list[GroupGoogleCalendarDTO],
 )
@@ -81,7 +84,7 @@ async def get_group_google_calendars(
     groups = await command_service.get_groups(course_run_id)
     return JSONResponse(
         status_code=status.HTTP_200_OK,
-        content=[GroupGoogleCalendarDTO.from_domain(g).model_dump(mode="json") for g in groups]
+        content=[GroupGoogleCalendarDTO.from_domain(g).model_dump(mode="json") for g in groups],
     )
 
 
@@ -117,7 +120,7 @@ async def delete_group_google_calendar(
         await command_service.delete(group_google_calendar_id)
         return JSONResponse(
             status_code=status.HTTP_200_OK,
-            content=SuccessResponse(message="Ссылка на google calendar успешно удалена").model_dump(mode="json")
+            content=SuccessResponse(message="Ссылка на google calendar успешно удалена").model_dump(mode="json"),
         )
     except GroupGoogleCalendarNotFoundError as ex:
         return JSONResponse(

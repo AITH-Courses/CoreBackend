@@ -4,7 +4,6 @@ from typing import TYPE_CHECKING
 
 from pydantic import BaseModel, Field
 
-
 if TYPE_CHECKING:
     from src.domain.group_google_calendar.entities import GroupGoogleCalendarEntity
 
@@ -34,26 +33,32 @@ class CreateGroupGoogleCalendarRequest(BaseModel):
     link: str
 
 
-class UpdateManyGroupGoogleCalendarsRequest(BaseModel):
+class UpdateCourseGroupGoogleCalendarsRequest(BaseModel):
 
-    """Schema-request for updating many group google calendars."""
+    """Schema-request for updating one group google calendars."""
 
     course_run_name: str = Field("Осень 2024")
-    courses: list[CourseDTO]
+    course: CourseDTO
 
 
-class UpdateManyGroupGoogleCalendarMessage(BaseModel):
+class UpdateCourseGroupGoogleCalendarMessageResponse(BaseModel):
 
-    """Schema-response for updating many group google calendars."""
+    """Schema-response for updating one group google calendars."""
 
     message: str = Field("OK")
 
 
 class CourseDTO(BaseModel):
+
+    """Schema of course for updating google calendar groups."""
+
     name: str = Field("A/B тестирование")
     groups: list[CourseGroupDTO]
 
 
 class CourseGroupDTO(BaseModel):
+
+    """Schema of certain google calendar group."""
+
     name: str = Field("Группа в 17:00")
     link: str = Field("https://calendar.google.com/calendar/...")

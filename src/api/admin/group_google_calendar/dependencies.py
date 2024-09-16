@@ -4,8 +4,8 @@ from typing import TYPE_CHECKING
 
 from fastapi import Depends
 
-from src.infrastructure.sqlalchemy.session import get_async_session
 from src.infrastructure.sqlalchemy.group_google_calendar.unit_of_work import SQLAlchemyGGCUnitOfWork
+from src.infrastructure.sqlalchemy.session import get_async_session
 from src.services.group_google_calendar.command_service import GroupGoogleCalendarCommandService
 
 if TYPE_CHECKING:

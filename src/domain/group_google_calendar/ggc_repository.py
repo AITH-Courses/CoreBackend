@@ -3,10 +3,9 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-from src.domain.group_google_calendar.entities import GroupGoogleCalendarEntity
-
 if TYPE_CHECKING:
     from src.domain.base_value_objects import UUID
+    from src.domain.group_google_calendar.entities import GroupGoogleCalendarEntity
 
 
 class IGroupGoogleCalendarRepository(ABC):

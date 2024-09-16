@@ -2,9 +2,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sqlalchemy import select, delete
+from sqlalchemy import delete, select
 
-from src.domain.group_google_calendar.entities import GroupGoogleCalendarEntity
 from src.domain.group_google_calendar.exceptions import GroupGoogleCalendarNotFoundError
 from src.domain.group_google_calendar.ggc_repository import IGroupGoogleCalendarRepository
 from src.infrastructure.sqlalchemy.group_google_calendar.models import GroupGoogleCalendar
@@ -13,6 +12,7 @@ if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
 
     from src.domain.base_value_objects import UUID
+    from src.domain.group_google_calendar.entities import GroupGoogleCalendarEntity
 
 
 class SQLAlchemyGroupGoogleCalendarRepository(IGroupGoogleCalendarRepository):
@@ -32,7 +32,6 @@ class SQLAlchemyGroupGoogleCalendarRepository(IGroupGoogleCalendarRepository):
             .where(GroupGoogleCalendar.id == group_google_calendar_id.value)
         )
         result = await self.session.execute(delete_statement)
-        print("REMOVED", result.rowcount)
         if result.rowcount == 0:
             raise GroupGoogleCalendarNotFoundError
 

@@ -3,11 +3,10 @@ from __future__ import annotations
 from abc import ABC, abstractmethod
 from typing import TYPE_CHECKING
 
-from src.domain.courses.value_objects import CourseName
-
 if TYPE_CHECKING:
     from src.domain.base_value_objects import UUID
     from src.domain.courses.entities import CourseEntity
+    from src.domain.courses.value_objects import CourseName
 
 class ICourseRepository(ABC):
 

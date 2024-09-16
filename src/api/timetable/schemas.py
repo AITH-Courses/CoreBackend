@@ -5,13 +5,13 @@ from typing import TYPE_CHECKING
 
 from pydantic import BaseModel
 
-from src.domain.group_google_calendar.entities import GroupGoogleCalendarEntity
-
 if TYPE_CHECKING:
+    from src.domain.group_google_calendar.entities import GroupGoogleCalendarEntity
     from src.domain.timetable.entities import TimetableEntity
 
 
 class LessonDTO(BaseModel):
+
     """Schema for lesson."""
 
     start_time: datetime.time
@@ -20,6 +20,7 @@ class LessonDTO(BaseModel):
 
 
 class GroupGoogleCalendarDTO(BaseModel):
+
     """Schema for group google calendar."""
 
     id: str
@@ -36,6 +37,7 @@ class GroupGoogleCalendarDTO(BaseModel):
 
 
 class TimetableDTO(BaseModel):
+
     """Schema for timetable."""
 
     lessons: list[LessonDTO]
@@ -44,7 +46,7 @@ class TimetableDTO(BaseModel):
 
     @staticmethod
     def from_domain(
-            timetable: TimetableEntity, course_run_name: str, google_calendar_groups: list[GroupGoogleCalendarEntity]
+            timetable: TimetableEntity, course_run_name: str, google_calendar_groups: list[GroupGoogleCalendarEntity],
     ) -> TimetableDTO:
         current_lessons = timetable.lessons
         return TimetableDTO(
@@ -55,5 +57,5 @@ class TimetableDTO(BaseModel):
                     date=lesson.start_time.date(),
                 ) for lesson in current_lessons],
             course_run_name=course_run_name,
-            group_google_calendars=[GroupGoogleCalendarDTO.from_domain(g) for g in google_calendar_groups]
+            group_google_calendars=[GroupGoogleCalendarDTO.from_domain(g) for g in google_calendar_groups],
         )

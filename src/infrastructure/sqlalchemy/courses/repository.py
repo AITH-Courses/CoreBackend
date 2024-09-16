@@ -9,7 +9,6 @@ from sqlalchemy.orm import joinedload
 
 from src.domain.courses.course_repository import ICourseRepository
 from src.domain.courses.exceptions import CourseNotFoundError
-from src.domain.courses.value_objects import CourseName
 from src.infrastructure.sqlalchemy.courses.models import Course, PeriodForCourse, RoleForCourse, RunForCourse
 
 if TYPE_CHECKING:
@@ -17,6 +16,7 @@ if TYPE_CHECKING:
 
     from src.domain.base_value_objects import UUID
     from src.domain.courses.entities import CourseEntity
+    from src.domain.courses.value_objects import CourseName
 
 
 class SQLAlchemyCourseRepository(ICourseRepository):
