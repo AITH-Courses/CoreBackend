@@ -8,20 +8,20 @@ if TYPE_CHECKING:
     from src.domain.playlists.entities import PlaylistEntity
 
 
-class IVideoPlaylistRepository(ABC):
+class IPlaylistRepository(ABC):
 
     """Interface of Repository for Video playlist."""
 
     @abstractmethod
-    async def create(self, video_playlist: PlaylistEntity) -> None:
+    async def create(self, playlist: PlaylistEntity) -> None:
         raise NotImplementedError
 
     @abstractmethod
-    async def update(self, video_playlist: PlaylistEntity) -> None:
+    async def update(self, playlist: PlaylistEntity) -> None:
         raise NotImplementedError
 
     @abstractmethod
-    async def delete(self, video_playlist_id: UUID) -> None:
+    async def delete(self, playlist_id: UUID) -> None:
         raise NotImplementedError
 
     @abstractmethod
