@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+import datetime
 import uuid
 from typing import TYPE_CHECKING
 
 from src.domain.base_value_objects import UUID, LinkValueObject
+from src.domain.course_run.exceptions import NoActualCourseRunError
 from src.domain.playlists.entities import PlaylistEntity
 from src.domain.playlists.value_objects import VideoResourceType
 
@@ -21,6 +23,15 @@ class PlaylistCommandService:
     async def get_playlists_by_course_run_id(self, course_run_id: str) -> list[PlaylistEntity]:
         course_run_id = UUID(course_run_id)
         return await self.uow.playlist_repo.get_all_by_course_run_id(course_run_id)
+
+    async def get_actual_playlists(self, course_id: str) -> list[PlaylistEntity]:
+        current_date = datetime.date.today()
+        course_id = UUID(course_id)
+        course_runs = await self.uow.course_run_repo.get_all_by_course_id(course_id)
+        for course_run in course_runs:
+            if course_run.is_actual_by_date(current_date):
+                return await self.uow.playlist_repo.get_all_by_course_run_id(course_run.id)
+        raise NoActualCourseRunError
 
     async def create_playlist(self, course_run_id: str, name: str, playlist_type: str, link: str) -> None:
         playlist_id = UUID(str(uuid.uuid4()))
