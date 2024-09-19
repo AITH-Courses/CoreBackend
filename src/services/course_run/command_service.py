@@ -8,7 +8,7 @@ from sqlalchemy.exc import IntegrityError
 
 from src.domain.base_value_objects import UUID
 from src.domain.course_run.entities import CourseRunEntity
-from src.domain.course_run.exceptions import CourseRunAlreadyExistsError
+from src.domain.course_run.exceptions import CourseRunAlreadyExistsError, NoActualCourseRunError
 from src.domain.courses.value_objects import CourseRun
 from src.domain.timetable.exceptions import NoActualTimetableError
 
@@ -75,4 +75,4 @@ class CourseRunCommandService:
                 if not timetable.lessons and not google_timetable_groups:
                     raise NoActualTimetableError(error_message=error_message)
                 return timetable, course_run, google_timetable_groups
-        raise NoActualTimetableError(error_message="Для курса еще не создан актуальный запуск")
+        raise NoActualCourseRunError
