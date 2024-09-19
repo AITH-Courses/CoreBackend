@@ -15,6 +15,7 @@ from src.infrastructure.sqlalchemy.timetable.models import TimetableRule
 from src.infrastructure.sqlalchemy.talent_profile.models import TalentProfile
 from src.infrastructure.sqlalchemy.favorite_courses.models import FavoriteCourse
 from src.infrastructure.sqlalchemy.group_google_calendar.models import GroupGoogleCalendar
+from src.infrastructure.sqlalchemy.playlists.models import Playlist
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
