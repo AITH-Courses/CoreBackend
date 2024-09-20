@@ -50,6 +50,7 @@ async def get_courses(
         roles: list[str] = Query(None),
         implementers: list[str] = Query(None),
         formats: list[str] = Query(None),
+        query: str = Query(None),
         page: int = Query(1),
         *,
         only_actual: bool = Query(default=False),
@@ -63,12 +64,13 @@ async def get_courses(
     :param roles:
     :param implementers:
     :param formats:
+    :param query:
     :param query_service:
     :return:
     """
     filters = CourseFilter(
         terms=terms, roles=roles, implementers=implementers,
-        formats=formats, only_actual=only_actual,
+        formats=formats, only_actual=only_actual, query=query,
     )
     courses = await query_service.get_courses(filters)
     paginator = Paginator[CourseEntity](data=courses, page_size=9)

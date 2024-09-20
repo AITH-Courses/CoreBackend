@@ -4,6 +4,7 @@ from fastapi.responses import JSONResponse
 from src.api.admin.course_run.dependencies import get_admin_course_run_command_service
 from src.api.base_schemas import ErrorResponse
 from src.api.timetable.schemas import TimetableDTO
+from src.domain.course_run.exceptions import NoActualCourseRunError
 from src.domain.timetable.exceptions import NoActualTimetableError
 from src.services.course_run.command_service import CourseRunCommandService
 
@@ -43,7 +44,7 @@ async def get_timetable_for_course(
                 timetable, course_run.name.value, google_calendar_groups,
             ).model_dump(mode="json"),
         )
-    except NoActualTimetableError as ex:
+    except (NoActualTimetableError, NoActualCourseRunError) as ex:
         return JSONResponse(
             content=ErrorResponse(message=ex.message).model_dump(),
             status_code=status.HTTP_404_NOT_FOUND,

@@ -17,3 +17,12 @@ class CourseRunAlreadyExistsError(DomainError):
     @property
     def message(self) -> str:
         return "Запуск курса уже существует"
+
+
+class NoActualCourseRunError(DomainError):
+
+    """Course run doesnt exist."""
+
+    @property
+    def message(self) -> str:
+        return "Для курса еще не создан актуальный запуск"

@@ -12,7 +12,7 @@ class ValueDoesntExistError(DomainError):
 
     @property
     def message(self) -> str:
-        return f"{self.property_name.capitalize()} does not exist"
+        return f"Такой {self.property_name} не существует"
 
 
 @dataclass

@@ -22,6 +22,7 @@ class CourseFilter:
     formats: list[str] | None = field(default=None)
     terms: list[str] | None = field(default=None)
     roles: list[str] | None = field(default=None)
+    query: str | None = field(default=None)
     only_actual: bool = field(default=False)
 
 
@@ -70,6 +71,8 @@ class TalentCourseQueryService:
         if filters.terms and not set(filters.terms).intersection(set(course.terms.value.split(", "))):
             return False
         if filters.formats and course.format.value not in filters.formats:
+            return False
+        if filters.query and filters.query.lower() not in course.name.value.lower():
             return False
         return not filters.only_actual or actual_run in {run.value for run in course.last_runs}
 
