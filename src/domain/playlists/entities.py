@@ -3,10 +3,9 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
-from src.domain.playlists.value_objects import VideoResourceType
-
 if TYPE_CHECKING:
     from src.domain.base_value_objects import UUID, LinkValueObject
+    from src.domain.playlists.value_objects import VideoResourceType
 
 
 @dataclass

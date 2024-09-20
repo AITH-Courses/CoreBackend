@@ -4,8 +4,8 @@ from fastapi.responses import JSONResponse
 from src.api.admin.courses.dependencies import get_admin
 from src.api.admin.group_google_calendar.dependencies import get_group_google_calendar_service
 from src.api.admin.group_google_calendar.schemas import (
-    UpdateCourseGroupGoogleCalendarsRequest,
     UpdateCourseGroupGoogleCalendarMessageResponse,
+    UpdateCourseGroupGoogleCalendarsRequest,
 )
 from src.domain.auth.entities import UserEntity
 from src.services.group_google_calendar.command_service import GroupGoogleCalendarCommandService
@@ -39,7 +39,7 @@ async def update_google_calendar_links(
     """
     course = UpdateGroupGoogleCalendarDTO(
         course_name=data.course.name,
-        groups=[UpdateGroupDTO(name=g.name, link=g.link) for g in data.course.groups]
+        groups=[UpdateGroupDTO(name=g.name, link=g.link) for g in data.course.groups],
     )
     message = await command_service.update(course, data.course_run_name)
     return JSONResponse(

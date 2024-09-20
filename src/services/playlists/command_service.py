@@ -25,7 +25,7 @@ class PlaylistCommandService:
         return await self.uow.playlist_repo.get_all_by_course_run_id(course_run_id)
 
     async def get_actual_playlists(self, course_id: str) -> list[PlaylistEntity]:
-        current_date = datetime.date.today()
+        current_date = datetime.datetime.now().date()
         course_id = UUID(course_id)
         course_runs = await self.uow.course_run_repo.get_all_by_course_id(course_id)
         for course_run in course_runs:
@@ -46,10 +46,10 @@ class PlaylistCommandService:
             await self.uow.rollback()
             raise
 
-    async def update_playlist(self, playlist_id: str, course_run_id: str, name: str, playlist_type: str, link: str) -> None:
+    async def update_playlist(self, playlist_id: str, course_run_id: str, name: str, type_: str, link: str) -> None:
         playlist_id = UUID(playlist_id)
         course_run_id = UUID(course_run_id)
-        playlist_type = VideoResourceType(playlist_type)
+        playlist_type = VideoResourceType(type_)
         link = LinkValueObject(link)
         playlist = PlaylistEntity(playlist_id, course_run_id, name, playlist_type, link)
         try:

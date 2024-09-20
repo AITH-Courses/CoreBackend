@@ -1,7 +1,7 @@
 from abc import ABC
 
-from src.domain.playlists.playlist_repository import IPlaylistRepository
 from src.domain.course_run.course_run_repository import ICourseRunRepository
+from src.domain.playlists.playlist_repository import IPlaylistRepository
 from src.services.base_unit_of_work import ServiceUnitOfWork
 
 

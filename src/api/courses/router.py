@@ -70,7 +70,7 @@ async def get_courses(
     """
     filters = CourseFilter(
         terms=terms, roles=roles, implementers=implementers,
-        formats=formats, only_actual=only_actual, query=query
+        formats=formats, only_actual=only_actual, query=query,
     )
     courses = await query_service.get_courses(filters)
     paginator = Paginator[CourseEntity](data=courses, page_size=9)

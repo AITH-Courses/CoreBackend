@@ -1,19 +1,22 @@
 from __future__ import annotations
 
 from typing import TYPE_CHECKING
-from sqlalchemy import select, update, delete
 
-from src.domain.playlists.entities import PlaylistEntity
+from sqlalchemy import delete, select, update
+
 from src.domain.playlists.exceptions import PlaylistNotFoundError
 from src.domain.playlists.playlist_repository import IPlaylistRepository
 from src.infrastructure.sqlalchemy.playlists.models import Playlist
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
+
     from src.domain.base_value_objects import UUID
+    from src.domain.playlists.entities import PlaylistEntity
 
 
 class SQLAlchemyPlaylistRepository(IPlaylistRepository):
+
     """SQLAlchemy's implementation of Repository for Playlist."""
 
     def __init__(self, session: AsyncSession) -> None:
